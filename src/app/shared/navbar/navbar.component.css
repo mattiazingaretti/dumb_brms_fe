@@ -1,0 +1,21 @@
+.navbar-logo{
+    width: 20%;
+    align-items: center;
+}
+
+.navbar{
+    justify-content: space-between;
+    
+}
+
+.navbar-links{
+    width: 40%;
+    justify-content: space-evenly;
+}
+
+.navbar-actions{
+    justify-content: center;
+    align-items: center;
+    width: 20%;
+}
+

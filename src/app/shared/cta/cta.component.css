@@ -1,0 +1,17 @@
+.cta-basic{
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    gap: 10px;
+    transition: transform 0.3s ease;
+}
+
+.cta-outline{
+    border: 1px solid var(--text-color);
+    border-radius: 10px;
+}
+
+.cta-basic:hover{
+    transform: scale(1.05);
+}

@@ -1,0 +1,7 @@
+<span class="cta-basic flx_row"
+ [ngClass]="{'cta-outline': isOutline == true  }"
+ (click)="clicked.emit()"
+ >
+    {{msg}} 
+    <mat-icon *ngIf="iconName !== undefined" aria-hidden="false" aria-label="icon" fontIcon="people"></mat-icon>
+</span>

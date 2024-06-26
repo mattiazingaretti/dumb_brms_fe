@@ -1,0 +1,21 @@
+<nav class="navbar flx_row">
+    <div class="navbar-logo flx_row">
+        <img src="assets/logo.png" alt="My App Logo" />
+    </div>
+    <ul class="navbar-links flx_row">
+        <li style="list-style-type: none">
+            <app-cta 
+                [msg]="'Features'"
+            ></app-cta>
+        </li>
+        <li style="list-style-type: none">
+            <app-cta [msg]="'Docs'"></app-cta>
+        </li>
+        <li style="list-style-type: none">
+            <app-cta [msg]="'About us'"></app-cta>
+        </li>
+    </ul>
+    <div class="navbar-actions flx_row">
+        <app-cta [msg]="'Join us'" [isOutline]="true" [iconName]="'fa-user-friends'"></app-cta>
+    </div>
+</nav>
