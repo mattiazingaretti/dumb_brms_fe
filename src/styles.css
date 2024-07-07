@@ -1,4 +1,4 @@
-
+/* 
 :root {
     --bg-color:#020303;
     --text-color:#edf7f6;
@@ -6,16 +6,14 @@
     --secondary-color:#2d2960;
     --accent-color:#5a3a88;
     
-}
+} */
 
 html, body{
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    margin: 0;
+    height: 100%;
     font-family: 'QuickSand';
 }
-i {
-    color: var(--text-color);
-}
+
 
 .flx_row{
     display: flex;
@@ -25,5 +23,3 @@ i {
     display: flex;
     flex-direction: column;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

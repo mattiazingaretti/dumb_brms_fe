@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import * as THREE from 'three';
+
 
 @Component({
   selector: 'app-homepage',

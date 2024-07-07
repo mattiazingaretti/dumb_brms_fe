@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { CtaComponent } from "../cta/cta.component";
+import { Router } from '@angular/router';
+import {AppPaths} from "../../app.routes"
+
 
 @Component({
     selector: 'app-navbar',
@@ -10,4 +13,9 @@ import { CtaComponent } from "../cta/cta.component";
 })
 export class NavbarComponent {
 
+    appPaths = AppPaths;
+    
+    constructor(public router: Router){
+
+    }
 }
