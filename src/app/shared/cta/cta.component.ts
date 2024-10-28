@@ -11,12 +11,11 @@ import {MatIconModule} from '@angular/material/icon';
 })
 export class CtaComponent {
   
-  @Input({required: true}) msg: string = '';
+  @Input() msg: string = '';
   
   @Input() isOutline: boolean = false;
 
-  @Input() iconName: string | undefined = undefined;
-
+  @Input() iconName?: string;
 
   @Output() clicked: EventEmitter<void> = new EventEmitter();
   

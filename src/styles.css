@@ -1,12 +1,11 @@
-/* 
+
 :root {
-    --bg-color:#020303;
-    --text-color:#edf7f6;
+    --bg-color:#edf7f6;
+    --text-color:#020303;
     --primary-color:#4bafa3;
     --secondary-color:#2d2960;
     --accent-color:#5a3a88;
-    
-} */
+}
 
 html, body{
     margin: 0;

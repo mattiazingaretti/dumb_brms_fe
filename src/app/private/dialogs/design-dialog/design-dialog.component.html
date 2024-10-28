@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Crate new Rule</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Rule Name</mat-label>
+    <input matInput [formControl]="ruleNameFormControl">
+    @if (ruleNameFormControl.hasError('required')) {
+        <mat-error>Rule Name is <strong>required</strong></mat-error>
+    }
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="onYesClick(data.ruleName)" [disabled]="ruleNameFormControl.invalid">Ok</button>
+</mat-dialog-actions>

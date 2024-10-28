@@ -6,11 +6,14 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
+import { CtaComponent } from "../../shared/cta/cta.component";
+import { Router } from '@angular/router';
+import { AppPaths } from '../../app.routes';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule,  MatFormFieldModule, MatInputModule,MatButtonModule, MatIconModule],
+  imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, CtaComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,8 +23,9 @@ export class LoginComponent {
 
   errorMessage = signal('');
   hide = signal(true);
-  
-  constructor(){
+  appPaths = AppPaths;
+
+  constructor(public router: Router){
     merge(this.email.statusChanges, this.email.valueChanges)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.updateErrorMessage());
@@ -42,4 +46,9 @@ export class LoginComponent {
     this.hide.set(!this.hide());
     event.stopPropagation();
   }
+
+
+  performLogin() {
+  }
+    
 }

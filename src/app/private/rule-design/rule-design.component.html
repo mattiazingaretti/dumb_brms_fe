@@ -1,0 +1,34 @@
+<div>
+    <div class="example-action-buttons">    
+        <div style="display: flex;">
+            <app-cta class="actions_inner" [iconName]="'expand'"  [isOutline]="true" (clicked)="accordion!.openAll()"></app-cta>
+            <app-cta class="actions_inner" [iconName]="'close_fullscreen'" [isOutline]="true" (clicked)="accordion!.closeAll()"></app-cta>
+        </div>
+        <app-cta class="actions_inner" [iconName]="'add'"  [isOutline]="true" (clicked)="addRule()"></app-cta>
+    </div>
+      <mat-accordion *ngFor="let panel of panels" class="example-headers-align" multi>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header >
+            <mat-panel-title>
+              ID: {{panel.idRule}}
+            </mat-panel-title>
+            <mat-panel-description class="header_style">
+              {{panel.ruleName}}
+              <mat-slide-toggle></mat-slide-toggle>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+      
+          <mat-form-field>
+            <mat-label>First name</mat-label>
+            <input matInput>
+          </mat-form-field>
+      
+          <mat-form-field>
+            <mat-label>Age</mat-label>
+            <input matInput type="number" min="1">
+          </mat-form-field>
+      
+        </mat-expansion-panel>
+      </mat-accordion>
+    
+</div>
