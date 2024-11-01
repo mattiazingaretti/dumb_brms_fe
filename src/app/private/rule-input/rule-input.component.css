@@ -1,0 +1,35 @@
+
+.cardContainer{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.card{
+    display: flex;
+    margin: 10px;
+}
+
+.ruleInputTable {
+    margin: 10px 0px 24px          
+}
+
+.dataInputClassContainer{
+    padding: 10px;
+}
+.dataInputClass{
+    padding: 5px;
+}
+
+.ruleInputActions{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.cardControls{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}

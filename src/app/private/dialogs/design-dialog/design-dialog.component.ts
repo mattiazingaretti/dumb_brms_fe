@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Form, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -32,24 +32,21 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class DesignDialogComponent {
 
-  ruleNameFormControl = new FormControl('', [Validators.required]);
-
+  ruleNameFormControl: FormControl<string | null> = new FormControl<string| null>('', [Validators.required]);
 
   constructor(public dialogRef: MatDialogRef<DesignDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {ruleName: string}){
 
-    }
+  }
   
-
-    
   onNoClick(): void {
     this.dialogRef.close({isCanceled: true,isOk: true});
   }
 
-  onYesClick(ruleName: string){
+  onYesClick(value: string){
     if(this.ruleNameFormControl.invalid)
       return
-    this.dialogRef.close({isOk: true, ruleName: ruleName});
+    this.dialogRef.close({isOk: true, ruleName: value});
   }
 
 

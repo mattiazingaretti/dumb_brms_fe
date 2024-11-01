@@ -1,7 +1,8 @@
-<span class="cta-basic flx_row"
+<button mat-button class="cta-basic flx_row"
  [ngClass]="{'cta-outline': isOutline == true  }"
- (click)="clicked.emit()"
+ [disabled]="isDisabled"
+ (click)="onClick()"
  >
     {{msg}} 
     <mat-icon *ngIf="iconName" aria-hidden="false" aria-label="icon">{{iconName}}</mat-icon>
-</span>
+</button>

@@ -51,6 +51,7 @@ export class RuleDesignComponent {
       }
       if(result.isCanceled)
         return
+      console.log(result)
       this.panels.push({idRule: 1, ruleName: result.ruleName})
     });
   }

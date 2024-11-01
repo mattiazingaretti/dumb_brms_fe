@@ -1,0 +1,127 @@
+<div class="cardControls">
+    <app-cta [msg]="'Add Card'" [isOutline]="true" (clicked)="onClickAddCard()"></app-cta>
+</div>
+<div class="cardContainer">
+    <div class="card">
+        <mat-card class="example-card" appearance="outlined">
+            <form>
+                <mat-card-header>
+                <mat-card-title>
+                    <app-dynamic-form-field [fControl]="getFormControl('title')">
+                    <ng-container>
+                        @if (getFormControl('title').hasError('required')) {
+                        <mat-error style="font-size: small"
+                        >Title is <strong>required</strong></mat-error
+                        >
+                        }
+                    </ng-container>
+                    </app-dynamic-form-field>
+                </mat-card-title>
+                <mat-card-subtitle>
+                    <app-dynamic-form-field [fControl]="getFormControl('descr')">
+                    </app-dynamic-form-field>
+                </mat-card-subtitle>
+                </mat-card-header>
+        
+                <table mat-table [dataSource]="dataSource" class="ruleInputTable mat-elevation-z8" >
+                <ng-container matColumnDef="dataType">
+                    <th mat-header-cell *matHeaderCellDef>Data Type</th>
+                    <td mat-cell *matCellDef="let element">{{ element.dataType }}</td>
+                </ng-container>
+        
+                <ng-container matColumnDef="identifier">
+                    <th mat-header-cell *matHeaderCellDef>Identifier</th>
+                    <td mat-cell *matCellDef="let element">
+                    {{ element.dataIdentifier }}
+                    </td>
+                </ng-container>
+        
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                </table>
+        
+                @if (!readOnly) {
+                <div class="dataInputClassContainer">
+                <mat-form-field class="dataInputClass">
+                    <mat-label>Data Type</mat-label>
+                    <input
+                    #input
+                    type="text"
+                    placeholder="Pick one"
+                    matInput
+                    [formControl]="getFormControl('dataType')"
+                    [matAutocomplete]="auto"
+                    (input)="filter()"
+                    (focus)="filter()"
+                    />
+                    <mat-autocomplete requireSelection #auto="matAutocomplete">
+                    @for (option of filteredOptions; track option) {
+                    <mat-option [value]="option">{{ option }}</mat-option>
+                    }
+                    </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field class="dataInputClass">
+                    <mat-label>Data Identifier</mat-label>
+                    <input matInput [formControl]="getFormControl('dataIdentifier')" />
+                    @if (getFormControl('dataIdentifier').hasError('required')) {
+                    <mat-error style="font-size: small"
+                    >Data Identifier is <strong>required</strong></mat-error
+                    >
+                    } @if
+                    (getFormControl('dataIdentifier').hasError('invalidDataIdentifier'))
+                    {
+                    <mat-error style="font-size: smaller"
+                    >Required max length of 20 no spaces and only numbers or letters
+                    chars</mat-error
+                    >
+                    }
+                </mat-form-field>
+                </div>
+                @if (fGroup.hasError('hasDuplicate')) {
+                <mat-error>Duplicate record. It already exist in table.</mat-error>
+                } @if (getFormControl('title').hasError('blank')) {
+                <mat-error style="font-size: small"
+                >It is required to <strong>change</strong> the value of the
+                title</mat-error
+                >
+                }@else if(getFormControl('title').hasError('invalidDataIdentifier')) {
+                <mat-error style="font-size: small"
+                >For the title it is required max length of 20 no spaces and only
+                numbers or letters chars</mat-error
+                >
+                } }
+            </form>
+            <mat-card-actions class="ruleInputActions">
+                @if (!readOnly) {
+                <app-cta
+                [msg]="'Add'"
+                [isOutline]="true"
+                (clicked)="onClickedAdd()"
+                [isDisabled]="
+                    getFormControl('title').invalid ||
+                    getFormControl('dataIdentifier').invalid ||
+                    getFormControl('dataType').invalid
+                "
+                ></app-cta>
+                <app-cta
+                [msg]="'Save'"
+                [isOutline]="true"
+                (clicked)="onClickedSave()"
+                [isDisabled]="
+                    getFormControl('title').invalid ||
+                    getFormControl('dataIdentifier').invalid ||
+                    getFormControl('dataType').invalid
+                "
+                ></app-cta>
+                }@else{
+                <app-cta
+                [msg]="'Edit'"
+                [isOutline]="true"
+                (clicked)="readOnly = false"
+                ></app-cta>
+                }
+            </mat-card-actions>
+            </mat-card>
+    </div>
+</div>
+
