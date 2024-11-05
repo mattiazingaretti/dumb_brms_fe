@@ -1,6 +1,6 @@
 import { CtaComponent } from './../../shared/cta/cta.component';
 import { MatInputModule } from '@angular/material/input';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -11,6 +11,17 @@ import { MatError, MatFormFieldModule, MatLabel } from '@angular/material/form-f
 import { validateDataIdentifier, validateTitle} from '../../shared/validators/rule-input.validator';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { max } from 'rxjs';
+
+
+export interface CardData {
+  id: number ,
+  readOnly: boolean,
+  fGroup: FormGroup,
+  dataSource: {dataIdentifier: string, dataType: string}[],
+  filteredOptions: string[];
+}
+
 
 @Component({
   selector: 'app-rule-input',
@@ -20,61 +31,69 @@ import {MatGridListModule} from '@angular/material/grid-list';
   styleUrl: './rule-input.component.css'
 })
 export class RuleInputComponent {
-onClickAddCard() {
-throw new Error('Method not implemented.');
-}
 
-  @ViewChild('input') input!: ElementRef<HTMLInputElement>;
   
-  dataSource: {dataIdentifier: string, dataType: string}[] = [];
+  options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
+
+  cards: CardData[] = [
+    {id: 1,readOnly: false, filteredOptions: this.options.slice() , fGroup: this.generateFgroup(), dataSource: [{dataIdentifier: 'ciao', dataType: 'NUMERIC'}] }
+  ]
+
+  @ViewChildren('input') input!: QueryList<ElementRef<HTMLInputElement>>;
+  
   displayedColumns: string[] = ['dataType', 'identifier'];
   
 
-  options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
-  filteredOptions: string[];
-  readOnly: boolean = false;
-
   constructor(){
-    this.filteredOptions = this.options.slice();
   }
 
-  fGroup : FormGroup = new FormGroup({
-    title: new FormControl<string>('Input Data Type Name',[Validators.required, validateTitle('Input Data Type Name'), validateDataIdentifier]),
-    descr: new FormControl<string>('Input Data Type Descr',[]),
-    dataType: new FormControl<string>('', [Validators.required]),
-    dataIdentifier: new FormControl<string>('', [Validators.required, validateDataIdentifier])
-  });
 
-
-  getFormControl(arg: string): FormControl {
-    return (this.fGroup.get(arg) as FormControl);
+  getFormControl(card: CardData, arg: string): FormControl {
+    return (card.fGroup.get(arg) as FormControl);
   }
 
   
 
-  onClickedAdd() {
-    const dataType = this.getFormControl('dataType').value
-    const dataId = this.getFormControl('dataIdentifier').value
+  onClickedAdd(card: CardData) {
 
-    const found = this.dataSource.find(d => d.dataIdentifier == dataId && d.dataType == dataType)
+    const dataType = card.fGroup.get('dataType')?.value
+    const dataId = card.fGroup.get('dataIdentifier')?.value
+
+    const found = card.dataSource.find(d => d.dataIdentifier == dataId && d.dataType == dataType)
 
     if(found === undefined){
-      this.dataSource =  [...this.dataSource,{dataIdentifier: dataId, dataType: dataType}]
+      card.dataSource =  [...card.dataSource,{dataIdentifier: dataId, dataType: dataType}]
     }else{
-      this.fGroup.setErrors({hasDuplicate: true})
+      card.fGroup.setErrors({hasDuplicate: true})
     }
 
   }
 
 
-  filter() {
-    const filterValue = this.input.nativeElement.value.toLowerCase();
-    this.filteredOptions = this.options.filter(o => o.toLowerCase().includes(filterValue));
+  filter(card: CardData,index : number) {
+    const filterValue = this.input.get(index)?.nativeElement.value.toLowerCase();
+    if(filterValue != undefined)
+      card.filteredOptions = this.options.filter(o => o.toLowerCase().includes(filterValue));
   }
-    
 
-  onClickedSave() {
-    this.readOnly = true
+  onClickedSave(card: CardData) {
+    card.readOnly = true
+  }
+
+
+  generateFgroup(){
+    const fGroup : FormGroup = new FormGroup({
+      title: new FormControl<string>('Input Data Type Name',[Validators.required, validateTitle('Input Data Type Name'), validateDataIdentifier]),
+      descr: new FormControl<string>('Input Data Type Descr',[]),
+      dataType: new FormControl<string>('', [Validators.required]),
+      dataIdentifier: new FormControl<string>('', [Validators.required, validateDataIdentifier])
+    });
+    return fGroup;
+  }
+
+  onClickAddCard() {
+    const maxId : number = this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id;
+    this.cards = [...this.cards, {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}]
   }
     
 }
