@@ -6,9 +6,9 @@ import {MatCardModule} from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { DynamicFormFieldComponent } from '../../shared/dynamic-form-field/dynamic-form-field.component';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatError, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
-import { validateDataIdentifier, validateTitle} from '../../shared/validators/rule-input.validator';
+import {uniqueDataType, validateDataIdentifier, validateTitle} from '../../shared/validators/rule-input.validator';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
 
@@ -87,7 +87,7 @@ export class RuleInputComponent {
 
   generateFgroup(){
     const fGroup : FormGroup = new FormGroup({
-      title: new FormControl<string>('DataType',[Validators.required, validateDataIdentifier]),
+      title: new FormControl<string>('DataType',[Validators.required, validateDataIdentifier, uniqueDataType(this.cards?.map(c => c.fGroup.get('title')?.value)||[])]),
       descr: new FormControl<string>('DataType Descr',[]),
       dataType: new FormControl<string>('', [Validators.required]),
       dataIdentifier: new FormControl<string>('', [Validators.required, validateDataIdentifier])

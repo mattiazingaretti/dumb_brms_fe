@@ -57,20 +57,20 @@
                             <input matInput [formControl]="getFormControl(card, 'dataIdentifier')" />
                             @if (getFormControl(card, 'dataIdentifier').hasError('required')) {
                             <mat-error style="font-size: small">Data Identifier is <strong>required</strong></mat-error>
-                            } @if(getFormControl(card, 'dataIdentifier').hasError('invalidDataIdentifier'))
-                            {
-                            <mat-error style="font-size: smaller">Required max length of 20 no spaces and only numbers or
-                                letters
-                                chars</mat-error>
+                            } @else if(getFormControl(card, 'dataIdentifier').hasError('invalidDataIdentifier')){
+                              <mat-error style="font-size: smaller">Required max length of 20 no spaces and only numbers or letterschars</mat-error>
                             }
                         </mat-form-field>
                     </div>
                     @if (card.fGroup.hasError('hasDuplicate')) {
-                    <mat-error>Duplicate record. It already exist in table.</mat-error>
+                      <mat-error>Duplicate record. It already exist in table.</mat-error>
                     }@else if(getFormControl(card, 'title').hasError('invalidDataIdentifier')) {
                     <mat-error style="font-size: small">For the title it is required max length of 20 no spaces and only
                         numbers or letters chars</mat-error>
-                    } }
+                    } @else if(getFormControl(card, 'title').hasError('duplicateDataType')) {
+                      <mat-error style="font-size: smaller">Please change card data type name. It already exists one. </mat-error>
+                    }
+                  }
                 </form>
                 <mat-card-actions class="ruleInputActions ">
                     @if (!card.readOnly) {
