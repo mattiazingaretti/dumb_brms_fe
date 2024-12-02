@@ -11,7 +11,7 @@ import { MatError, MatFormFieldModule, MatLabel } from '@angular/material/form-f
 import { validateDataIdentifier, validateTitle} from '../../shared/validators/rule-input.validator';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
-import { max } from 'rxjs';
+
 
 
 export interface CardData {
@@ -32,27 +32,31 @@ export interface CardData {
 })
 export class RuleInputComponent {
 
-  
+
   options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
 
   cards: CardData[] = [
-    {id: 1,readOnly: false, filteredOptions: this.options.slice() , fGroup: this.generateFgroup(), dataSource: [{dataIdentifier: 'ciao', dataType: 'NUMERIC'}] }
+    {id: 1,readOnly: true, filteredOptions: this.options.slice() , fGroup: this.generateFgroup(), dataSource: [{dataIdentifier: 'ciao', dataType: 'NUMERIC'}] }
   ]
 
   @ViewChildren('input') input!: QueryList<ElementRef<HTMLInputElement>>;
-  
+
   displayedColumns: string[] = ['dataType', 'identifier'];
-  
+
 
   constructor(){
   }
+
 
 
   getFormControl(card: CardData, arg: string): FormControl {
     return (card.fGroup.get(arg) as FormControl);
   }
 
-  
+  getCardFormGroup(card: CardData): FormGroup {
+    return card.fGroup;
+  }
+
 
   onClickedAdd(card: CardData) {
 
@@ -83,8 +87,8 @@ export class RuleInputComponent {
 
   generateFgroup(){
     const fGroup : FormGroup = new FormGroup({
-      title: new FormControl<string>('Input Data Type Name',[Validators.required, validateTitle('Input Data Type Name'), validateDataIdentifier]),
-      descr: new FormControl<string>('Input Data Type Descr',[]),
+      title: new FormControl<string>('DataType',[Validators.required, validateDataIdentifier]),
+      descr: new FormControl<string>('DataType Descr',[]),
       dataType: new FormControl<string>('', [Validators.required]),
       dataIdentifier: new FormControl<string>('', [Validators.required, validateDataIdentifier])
     });
@@ -95,5 +99,7 @@ export class RuleInputComponent {
     const maxId : number = this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id;
     this.cards = [...this.cards, {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}]
   }
-    
+
+
+
 }

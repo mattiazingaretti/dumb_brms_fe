@@ -67,26 +67,18 @@
                     </div>
                     @if (card.fGroup.hasError('hasDuplicate')) {
                     <mat-error>Duplicate record. It already exist in table.</mat-error>
-                    } @if (getFormControl(card, 'title').hasError('blank')) {
-                    <mat-error style="font-size: small">It is required to <strong>change</strong> the value of the
-                        title</mat-error>
                     }@else if(getFormControl(card, 'title').hasError('invalidDataIdentifier')) {
                     <mat-error style="font-size: small">For the title it is required max length of 20 no spaces and only
                         numbers or letters chars</mat-error>
                     } }
                 </form>
-                <mat-card-actions class="ruleInputActions">
+                <mat-card-actions class="ruleInputActions ">
                     @if (!card.readOnly) {
-                    <app-cta [msg]="'Add'" [isOutline]="true" (clicked)="onClickedAdd(card)" [isDisabled]="
-                        getFormControl(card, 'title').invalid ||
-                        getFormControl(card, 'dataIdentifier').invalid ||
-                        getFormControl(card, 'dataType').invalid
-                    "></app-cta>
-                    <app-cta [msg]="'Save'" [isOutline]="true" (clicked)="onClickedSave(card)" [isDisabled]="
-                        getFormControl(card, 'title').invalid ||
-                        getFormControl(card, 'dataIdentifier').invalid ||
-                        getFormControl(card, 'dataType').invalid
-                    "></app-cta>
+                      <div class="ruleInputActions">
+                        <app-cta [msg]="'Cancel'" [isOutline]="true" (clicked)="card.readOnly = true" ></app-cta>
+                        <app-cta [msg]="'Add'" [isOutline]="true" (clicked)="onClickedAdd(card)" [isDisabled]="getCardFormGroup(card).invalid"></app-cta>
+                      </div>
+                      <app-cta [msg]="'Save'" [isOutline]="true" (clicked)="onClickedSave(card)" [isDisabled]="getCardFormGroup(card).invalid"></app-cta>
                     }@else{
                     <app-cta [msg]="'Edit'" [isOutline]="true" (clicked)="card.readOnly = false"></app-cta>
                     }
