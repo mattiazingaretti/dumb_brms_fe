@@ -1,5 +1,5 @@
 <div class="cardControls">
-    <app-cta [msg]="'Add Card'" [isOutline]="true" (clicked)="onClickAddCard()"></app-cta>
+    <app-cta [class]="'smallMargin'" [msg]="'Add Card'" [isOutline]="true" (clicked)="onClickAddCard()"></app-cta>
 </div>
 <div class="cardContainer">
     @for (card of cards; track card.id) {
@@ -8,13 +8,17 @@
                 <form>
                     <mat-card-header>
                         <mat-card-title>
-                            <app-dynamic-form-field [fControl]="getFormControl(card, 'title')">
+                            <div>
+                              <app-dynamic-form-field [fControl]="getFormControl(card, 'title')">
                                 <ng-container>
-                                    @if (getFormControl(card, 'title').hasError('required')) {
+                                  @if (getFormControl(card, 'title').hasError('required')) {
                                     <mat-error style="font-size: small">Title is <strong>required</strong></mat-error>
-                                    }
+                                  }
                                 </ng-container>
-                            </app-dynamic-form-field>
+                              </app-dynamic-form-field>
+                              <button mat-icon-button (click)="onDeleteCard(card)"><mat-icon>delete</mat-icon></button>
+                            </div>
+
                         </mat-card-title>
                         <mat-card-subtitle>
                             <app-dynamic-form-field [fControl]="getFormControl(card, 'descr')">
@@ -34,7 +38,6 @@
                                 {{ element.dataIdentifier }}
                             </td>
                         </ng-container>
-
                         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
                     </table>

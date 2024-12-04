@@ -14,6 +14,9 @@
 .ruleInputTable {
     margin: 10px 0px 24px
 }
+.smallMargin{
+    margin: 10px 10px 10px 10px;
+}
 .example-card{
   /*min-height: ; !* Set a minimum height for the card *!*/
   min-width: 600px; /* Set a minimum height for the card */

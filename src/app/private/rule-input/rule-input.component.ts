@@ -8,7 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 import { DynamicFormFieldComponent } from '../../shared/dynamic-form-field/dynamic-form-field.component';
 import {AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatError, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
-import {uniqueDataType, validateDataIdentifier, validateTitle} from '../../shared/validators/rule-input.validator';
+import {uniqueDataType, validateDataIdentifier} from '../../shared/validators/rule-input.validator';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
 
@@ -101,5 +101,9 @@ export class RuleInputComponent {
   }
 
 
+  onDeleteCard(card: CardData) {
+
+    this.cards = [...this.cards.filter(c => c.id != card.id)]
+  }
 
 }
