@@ -6,7 +6,7 @@
         </div>
         <app-cta class="actions_inner" [iconName]="'add'"  [isOutline]="true" (clicked)="addRule()"></app-cta>
     </div>
-      <mat-accordion *ngFor="let panel of panels" class="example-headers-align" multi>
+      <mat-accordion *ngFor="let panel of rules" class="example-headers-align" multi>
         <mat-expansion-panel>
           <mat-expansion-panel-header >
             <mat-panel-title>

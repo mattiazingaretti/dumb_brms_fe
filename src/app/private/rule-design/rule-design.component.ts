@@ -12,6 +12,22 @@ import { CtaComponent } from '../../shared/cta/cta.component';
 import {  MatDialog} from '@angular/material/dialog';
 import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.component';
 
+
+export interface Actions{
+
+}
+
+export interface Conditions{
+
+}
+
+export interface Rule{
+  idRule: number,
+  ruleName: string ,
+  conditions: Conditions[]
+  actions: Actions[]
+}
+
 @Component({
   selector: 'app-rule-design',
   standalone: true,
@@ -33,7 +49,7 @@ import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.co
 export class RuleDesignComponent {
   @ViewChild(MatAccordion) accordion?: MatAccordion;
 
-  panels: {idRule: number, ruleName: string}[] = [{idRule: 1, ruleName: "ruleName"}]
+  rules: Rule[] = [{idRule: 1, ruleName: "TestRuleName", conditions: [], actions: []}]
 
   constructor(public dialog: MatDialog){
 
@@ -42,8 +58,6 @@ export class RuleDesignComponent {
   addRule(){
     const dialogRef = this.dialog.open(DesignDialogComponent, {data: {ruleName: ""}});
 
-
-    //TODO add local storage for rule maintance
     dialogRef.afterClosed().subscribe((result) => {
       if(!result.isOk){
         console.error("Something went wrong");
@@ -51,8 +65,7 @@ export class RuleDesignComponent {
       }
       if(result.isCanceled)
         return
-      console.log(result)
-      this.panels.push({idRule: 1, ruleName: result.ruleName})
+      this.rules.push({idRule: this.rules.length+1, ruleName: result.ruleName , conditions: [] , actions: []})
     });
   }
 }

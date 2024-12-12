@@ -2,6 +2,8 @@
     <app-cta [class]="'smallMargin'" [msg]="'Add Card'" [isOutline]="true" (clicked)="onClickAddCard()"></app-cta>
 </div>
 <div class="cardContainer">
+
+    <!-- TODO add a validator across all cards data type and verify that the data type name is unique across all the classes in the project -->
     @for (card of cards; track card.id) {
         <div class="card">
             <mat-card class="example-card" appearance="outlined">
