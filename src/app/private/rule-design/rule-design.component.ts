@@ -11,6 +11,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { CtaComponent } from '../../shared/cta/cta.component';
 import {  MatDialog} from '@angular/material/dialog';
 import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.component';
+import { RuleDesignWhenComponent } from "../rule-design-when/rule-design-when.component";
 
 @Component({
   selector: 'app-rule-design',
@@ -25,8 +26,9 @@ import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.co
     MatInputModule,
     MatDatepickerModule,
     MatSlideToggleModule,
-    CtaComponent
-  ],
+    CtaComponent,
+    RuleDesignWhenComponent
+],
   templateUrl: './rule-design.component.html',
   styleUrl: './rule-design.component.css'
 })
