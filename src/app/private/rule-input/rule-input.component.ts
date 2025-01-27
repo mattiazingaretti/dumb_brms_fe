@@ -33,6 +33,7 @@ export interface CardData {
 export class RuleInputComponent {
 
 
+
   options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
 
   cards: CardData[] = [
@@ -41,7 +42,7 @@ export class RuleInputComponent {
 
   @ViewChildren('input') input!: QueryList<ElementRef<HTMLInputElement>>;
 
-  displayedColumns: string[] = ['dataType', 'identifier'];
+  displayedColumns: string[] = ['toDelete','dataType', 'identifier'];
 
 
   constructor(){
@@ -58,7 +59,7 @@ export class RuleInputComponent {
   }
 
 
-  onClickedAdd(card: CardData) {
+  onClickedAddField(card: CardData) {
 
     const dataType = card.fGroup.get('dataType')?.value
     const dataId = card.fGroup.get('dataIdentifier')?.value
@@ -96,14 +97,21 @@ export class RuleInputComponent {
   }
 
   onClickAddCard() {
-    const maxId : number = this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id;
+    const maxId : number = this.cards.length > 0 ? this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id : 0;
     this.cards = [...this.cards, {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}]
   }
 
 
   onDeleteCard(card: CardData) {
-
     this.cards = [...this.cards.filter(c => c.id != card.id)]
   }
 
+  onDeleteCardField(card: CardData,cardField:  {dataIdentifier: string, dataType: string}) {
+    card.dataSource = card.dataSource.length > 0 ?  card.dataSource.filter(d => d.dataIdentifier !== cardField.dataIdentifier || d.dataType !== cardField.dataType) : []
+    card.dataSource  = [...card.dataSource]
+  }
+    
+  getDisplayedColumns(card: CardData): Iterable<string> {
+    return card.readOnly ?  this.displayedColumns.filter(c => c !== 'toDelete') : this.displayedColumns
+  }
 }

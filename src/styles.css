@@ -22,3 +22,8 @@ html, body{
     display: flex;
     flex-direction: column;
 }
+
+.flex_row_center{
+    display: flex;
+    align-items: center;
+}

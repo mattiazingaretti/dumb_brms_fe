@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './dynamic-form-field.component.css'
 })
 export class DynamicFormFieldComponent {
+  
 
 
   isEdit: boolean = false;
@@ -33,7 +34,10 @@ export class DynamicFormFieldComponent {
       this.isEdit = this.isEdit;
   }
 
-
+  onSubmit() {
+    this.onFocusOut(); 
+  }
+    
   onClick() {
     this.isEdit = true
     this.cd.detectChanges(); //Otherwhise we cannot detect the change in the dom for the ngif
