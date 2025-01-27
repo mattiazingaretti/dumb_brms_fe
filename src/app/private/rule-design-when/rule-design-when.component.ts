@@ -46,7 +46,6 @@ export class RuleDesignWhenComponent {
     );
   }
 
-  // Method to filter the options array
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
     return this.options.filter(option => option.toLowerCase().includes(filterValue));
