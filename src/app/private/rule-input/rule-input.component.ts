@@ -11,6 +11,7 @@ import { MatError, MatFormFieldModule, MatLabel } from '@angular/material/form-f
 import {uniqueDataType, validateDataIdentifier} from '../../shared/validators/rule-input.validator';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
+import {CommonModule} from "@angular/common";
 
 
 
@@ -26,7 +27,7 @@ export interface CardData {
 @Component({
   selector: 'app-rule-input',
   standalone: true,
-  imports: [MatGridListModule,MatAutocompleteModule , CtaComponent,DynamicFormFieldComponent,FormsModule,ReactiveFormsModule, MatFormFieldModule, MatInputModule,MatLabel,MatCardModule,MatError, MatButtonModule, MatTableModule, MatIcon],
+  imports: [CommonModule,MatGridListModule,MatAutocompleteModule , CtaComponent,DynamicFormFieldComponent,FormsModule,ReactiveFormsModule, MatFormFieldModule, MatInputModule,MatLabel,MatCardModule,MatError, MatButtonModule, MatTableModule, MatIcon],
   templateUrl: './rule-input.component.html',
   styleUrl: './rule-input.component.css'
 })
