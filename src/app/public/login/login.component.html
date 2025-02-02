@@ -3,7 +3,7 @@
         <h2>Login </h2>
         <mat-form-field>
             <mat-label>Enter your email</mat-label>
-            <input matInput [formControl]="email" (blur)="updateErrorMessage()" required  autocomplete="one-time-code"/>
+            <input matInput [formControl]="email" (blur)="updateErrorMessage(email)" required  autocomplete="one-time-code"/>
             @if (email.invalid) {
               <mat-error>{{errorMessage()}}</mat-error>
             }
@@ -11,7 +11,7 @@
         
         <mat-form-field>
             <mat-label>Enter your password</mat-label>
-            <input matInput [type]="hide() ? 'password' : 'text'" autocomplete="one-time-code"/>
+            <input matInput [formControl]="password" [type]="hide() ? 'password' : 'text'" autocomplete="one-time-code"/>
             <button
               mat-icon-button
               matSuffix
