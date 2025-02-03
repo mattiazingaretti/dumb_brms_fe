@@ -7,8 +7,12 @@ import { AboutComponent } from './public/about/about.component';
 import { SignupComponent } from './public/signup/signup.component';
 import { DashboardComponent } from './private/dashboard/dashboard.component';
 import { DesignComponent } from './private/design/design.component';
+import {authGuard} from "./shared/auth.guard";
 
-
+export const LocalKeys = {
+    AUTH_TOKEN: 'authToken',
+    LOGGED_USER: 'loggedUser'
+}
 
 export const AppPaths = {
     LOGIN: 'login',
@@ -23,12 +27,12 @@ export const AppPaths = {
 
 export const routes: Routes = [
     { path: AppPaths.ROOT,title: 'fancy homepage', component: HomepageComponent},
-    { path: AppPaths.DASHBOARD,title: 'dashboard', component: DashboardComponent},
+    { path: AppPaths.DASHBOARD,title: 'dashboard', component: DashboardComponent, canActivate: [authGuard]},
     { path: AppPaths.DOCS, title: 'docs page', component: DocsComponent},
     { path: AppPaths.ABOUT, title: 'about page', component: AboutComponent},
     { path: AppPaths.FEATURES, title: 'features page', component: FeaturesComponent},
     { path: AppPaths.LOGIN, title: 'login page', component: LoginComponent},
     { path: AppPaths.SIGNUP, title: 'signup page', component: SignupComponent},
-    { path: AppPaths.DESIGN_BOARD, title: 'design page', component: DesignComponent}
+    { path: AppPaths.DESIGN_BOARD, title: 'design page', component: DesignComponent , canActivate: [authGuard]}
 
 ];

@@ -12,6 +12,7 @@ import { AppPaths } from '../../app.routes';
 import {AuthControllerService} from "../../api/api/authController.service";
 import {LoginRequestDTO} from "../../model/loginRequestDTO";
 import {JwtResponseDTO} from "../../api/model/jwtResponseDTO";
+import {AuthService} from "../../shared/services/auth.service";
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,8 @@ export class LoginComponent {
 
   constructor(
       public router: Router,
-      public authController: AuthControllerService
+      public authController: AuthControllerService,
+      public authService: AuthService
   ){
     merge(this.email.statusChanges, this.email.valueChanges)
       .pipe(takeUntilDestroyed())
@@ -68,7 +70,7 @@ export class LoginComponent {
         password: this.password.value!
     }
     this.authController.authenticateUser(loginRequestDTO).subscribe((jwt: JwtResponseDTO) => {
-        console.log('Logged in with token: ' + jwt.token);
+        this.authService.login(jwt);
         this.router.navigate([AppPaths.DASHBOARD]);
     })
   }
