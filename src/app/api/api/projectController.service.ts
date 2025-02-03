@@ -10,16 +10,18 @@
  * Do not edit the class manually.
  *//* tslint:disable:no-unused-variable member-ordering */
 
-import {Inject, Injectable, Optional} from '@angular/core';
-import {HttpClient, HttpEvent, HttpHeaders, HttpResponse} from '@angular/common/http';
+import { Inject, Injectable, Optional }                      from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
 
-import {Observable} from 'rxjs';
+import { Observable }                                        from 'rxjs';
 
-import {PostedResourceDTO} from '../model/postedResourceDTO';
-import {ProjectDTO} from '../model/projectDTO';
+import { PostedResourceDTO } from '../model/postedResourceDTO';
+import { ProjectDTO } from '../model/projectDTO';
+import { ProjectResponseDTO } from '../model/projectResponseDTO';
 
-import {BASE_PATH} from '../variables';
-import {Configuration} from '../configuration';
+import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
+import { Configuration }                                     from '../configuration';
 
 
 @Injectable()
@@ -93,6 +95,42 @@ export class ProjectControllerService {
         return this.httpClient.request<PostedResourceDTO>('post',`${this.basePath}/project/addProject`,
             {
                 body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getUserProjects(observe?: 'body', reportProgress?: boolean): Observable<Array<ProjectResponseDTO>>;
+    public getUserProjects(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<ProjectResponseDTO>>>;
+    public getUserProjects(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<ProjectResponseDTO>>>;
+    public getUserProjects(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<Array<ProjectResponseDTO>>('get',`${this.basePath}/project/getProjects`,
+            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

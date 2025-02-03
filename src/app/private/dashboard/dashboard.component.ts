@@ -8,23 +8,11 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {AddProjectDialogComponent} from "../../shared/dialogs/add-project-dialog/add-project-dialog.component";
+import {ProjectControllerService} from "../../api/api/projectController.service";
+import {ProjectDTO} from "../../api/model/projectDTO";
+import {PostedResourceDTO} from "../../api/model/postedResourceDTO";
+import {ProjectResponseDTO} from "../../api/model/projectResponseDTO";
 
-
-export interface ProjectData {
-  idProject: number,
-  projectName: string,
-  lastUpdate: Date,
-  creationDate: Date
-}
-
-const MOCK_DATA: ProjectData[] = [
-  {
-    idProject: 1,
-    projectName: 'This is a mock project name',
-    lastUpdate: new Date(),
-    creationDate: new Date()
-  }
-];
 
 @Component({
   selector: 'app-dashboard',
@@ -43,20 +31,25 @@ const MOCK_DATA: ProjectData[] = [
 export class DashboardComponent implements OnInit{
 
 
-  displayedColumns: string[] = ['idProject', 'projectName', 'lastUpdate', 'creationDate', 'actions'];
-  dataSource: ProjectData[] = []
+  displayedColumns: string[] = ['id', 'name', 'lastUpdate', 'creationDate', 'actions'];
+  dataSource: ProjectResponseDTO[] = []
 
   constructor(
       public router: Router,
-      private dialog: MatDialog
+      private dialog: MatDialog,
+      public projectsControllerService: ProjectControllerService
   ){
-    this.dataSource = MOCK_DATA
   }
 
   ngOnInit(): void {
-  
+    this.refreshDataSource();
   }
 
+  refreshDataSource(){
+    this.projectsControllerService.getUserProjects().subscribe((res: ProjectResponseDTO[])=>{
+      this.dataSource = res;
+    });
+  }
 
 
   onClick(element: any){
@@ -66,13 +59,19 @@ export class DashboardComponent implements OnInit{
   }
 
   openAddProjDialog() {
-    this.dialog.open(AddProjectDialogComponent).afterClosed().subscribe((result: { isOk: boolean, projName: string }) => {
+    this.dialog.open(AddProjectDialogComponent).afterClosed().subscribe((result: { isOk: boolean, projName?: string }) => {
         if (!result.isOk) {
           console.error('Error in dialog project creation');
         }
-
+        let payload: ProjectDTO = {
+            name: result.projName
+        }
         //this.dataSource.push({creationDate});
-
+        this.projectsControllerService.addProject(payload).subscribe((res: PostedResourceDTO)=>{
+            if(res.success){
+              this.refreshDataSource()
+            }
+        })
     });
   }
 }

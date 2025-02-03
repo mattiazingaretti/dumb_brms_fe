@@ -8,6 +8,7 @@ import { SignupComponent } from './public/signup/signup.component';
 import { DashboardComponent } from './private/dashboard/dashboard.component';
 import { DesignComponent } from './private/design/design.component';
 import {authGuard} from "./shared/auth.guard";
+import {SettingsComponent} from "./private/settings/settings.component";
 
 export const LocalKeys = {
     AUTH_TOKEN: 'authToken',
@@ -16,6 +17,7 @@ export const LocalKeys = {
 
 export const AppPaths = {
     LOGIN: 'login',
+    SETTINGS: 'settings',
     SIGNUP: 'signup',
     DOCS: 'docs',
     FEATURES: 'features',
@@ -33,6 +35,7 @@ export const routes: Routes = [
     { path: AppPaths.FEATURES, title: 'features page', component: FeaturesComponent},
     { path: AppPaths.LOGIN, title: 'login page', component: LoginComponent},
     { path: AppPaths.SIGNUP, title: 'signup page', component: SignupComponent},
-    { path: AppPaths.DESIGN_BOARD, title: 'design page', component: DesignComponent , canActivate: [authGuard]}
+    { path: AppPaths.DESIGN_BOARD, title: 'design page', component: DesignComponent , canActivate: [authGuard]},
+    { path: AppPaths.SETTINGS, title: 'settings page', component: SettingsComponent , canActivate: [authGuard]}
 
 ];

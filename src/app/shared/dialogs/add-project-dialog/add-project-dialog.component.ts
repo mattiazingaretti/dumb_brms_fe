@@ -47,12 +47,12 @@ export class AddProjectDialogComponent {
   }
 
   onNoClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close({isOk: true, projName: undefined});
   }
 
   onYesClick(): void {
     if (this.projectForm.valid) {
-      this.dialogRef.close({isOk: true, projName: this.projectForm.value});
+      this.dialogRef.close({isOk: true, projName: this.projectForm.get('projectName',)?.value});
     }
   }
 

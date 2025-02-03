@@ -1,11 +1,17 @@
 import { Injectable } from '@angular/core';
-import {LocalKeys} from "../../app.routes";
+import {AppPaths, LocalKeys} from "../../app.routes";
 import {JwtResponseDTO} from "../../api/model/jwtResponseDTO";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  appPaths = AppPaths;
+
+  constructor( public router: Router) {}
+
 
   isLoggedIn(): boolean {
     // Example: Check if a token exists in local storage
@@ -20,6 +26,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(LocalKeys.AUTH_TOKEN);
     localStorage.removeItem(LocalKeys.LOGGED_USER);
+    this.router.navigate([this.appPaths.ROOT]);
   }
 
 

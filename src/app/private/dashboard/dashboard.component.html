@@ -6,15 +6,15 @@
         </div>
         <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table">
             <!-- idProject Column -->
-            <ng-container matColumnDef="idProject">
+            <ng-container matColumnDef="id">
               <th mat-header-cell *matHeaderCellDef>Id Project</th>
-              <td mat-cell *matCellDef="let element">{{element.idProject}}</td>
+              <td mat-cell *matCellDef="let element">{{element.id}}</td>
             </ng-container>
           
 
-            <ng-container matColumnDef="projectName">
+            <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Project Name</th>
-              <td mat-cell *matCellDef="let element">{{element.projectName}}</td>
+              <td mat-cell *matCellDef="let element">{{element.name}}</td>
             </ng-container>
           
             <ng-container matColumnDef="lastUpdate">

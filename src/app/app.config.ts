@@ -6,14 +6,17 @@ import {provideAnimations} from '@angular/platform-browser/animations';
 import {Configuration, CONFIGURATION_PARAMETERS} from "./api/configuration";
 import {AuthControllerService} from "./api/api/authController.service";
 import {provideHttpClient, withInterceptors} from "@angular/common/http";
+import {authInterceptorInterceptor} from "./shared/auth-interceptor.interceptor";
+import {ProjectControllerService} from "./api/api/projectController.service";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     AuthControllerService,
+    ProjectControllerService,
     { provide: CONFIGURATION_PARAMETERS, useValue: { basePath: 'http://localhost:8080', withCredentials: true } },
     Configuration,
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(withInterceptors([]))
+    provideHttpClient(withInterceptors([authInterceptorInterceptor])),
   ]
 };
