@@ -1,18 +1,25 @@
-import { CtaComponent } from './../../shared/cta/cta.component';
-import { MatInputModule } from '@angular/material/input';
-import { Component, ElementRef, ViewChildren, QueryList } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import {CtaComponent} from './../../shared/cta/cta.component';
+import {MatInputModule} from '@angular/material/input';
+import {Component, ElementRef, QueryList, ViewChildren} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { DynamicFormFieldComponent } from '../../shared/dynamic-form-field/dynamic-form-field.component';
-import {AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import { MatError, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
+import {MatTableModule} from '@angular/material/table';
+import {DynamicFormFieldComponent} from '../../shared/dynamic-form-field/dynamic-form-field.component';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatError, MatFormFieldModule, MatLabel} from '@angular/material/form-field';
 import {uniqueDataType, validateDataIdentifier} from '../../shared/validators/rule-input.validator';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {CommonModule} from "@angular/common";
-
+import {LocalKeys} from "../../app.routes";
+import {BehaviorSubject, Subscription} from "rxjs";
+import {DesignControllerService} from "../../api/api/designController.service";
+import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
+import {ActivatedRoute} from "@angular/router";
+import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseDTO";
+import {RuleInputRequestDTO} from "../../api/model/ruleInputRequestDTO";
+import {PostedResourceDTO} from "../../model/postedResourceDTO";
 
 
 export interface CardData {
@@ -33,26 +40,73 @@ export interface CardData {
 })
 export class RuleInputComponent {
 
-
+  subscriptions: Subscription[] = [];
+  needToBeSaved: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
 
-  cards: CardData[] = [
-    {id: 1,readOnly: true, filteredOptions: this.options.slice() , fGroup: this.generateFgroup(), dataSource: [{dataIdentifier: 'ciao', dataType: 'NUMERIC'}] }
-  ]
+  cards: CardData[] = []
 
   @ViewChildren('input') input!: QueryList<ElementRef<HTMLInputElement>>;
 
   displayedColumns: string[] = ['toDelete','dataType', 'identifier'];
+  projectId?: string | null;
 
 
-  constructor(){
+  constructor(
+      public designControllerService: DesignControllerService,
+      private route: ActivatedRoute
+  ){
+
+  }
+
+  ngOnInit(): void {
+    this.projectId = this.route.snapshot.queryParamMap.get('id');
+    if(this.projectId == null){
+      console.error("Project Id is null");
+    }
+    const ruleInput = localStorage.getItem(LocalKeys.RULE_INPUT)
+    const ruleFormData = localStorage.getItem(LocalKeys.RULE_INPUT_FORM_DATA)
+    if(ruleInput != null && ruleFormData != null){
+       let ruleInputJson = JSON.parse(ruleInput)
+       let ruleInputFormJson = JSON.parse(ruleFormData)
+       let almostCards = ruleInputJson.map((c: {id: number, filteredOptions: string[], dataSource: {dataIdentifier: string, dataType: string}[]}) =>
+          {return {id: c.id, readOnly: true, filteredOptions: c.filteredOptions, fGroup: this.generateFgroup(), dataSource: c.dataSource}}
+         )
+      almostCards.forEach((c: CardData, index: number) => {
+        c.fGroup.patchValue(ruleInputFormJson[index])
+      })
+      this.cards = almostCards
+    }else{
+        if(this.projectId != null){
+          this.designControllerService.getRuleInputData(parseInt(this.projectId!)).subscribe((data: RuleInputResponseDTO[]) => {
+              let almostCards :any = data.map((c: RuleInputResponseDTO , i: number) =>{
+                  let dataSrc = c.fields?.map((field: RuleInputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
+                  return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
+              });
+              almostCards.forEach((c: any, index: number) => {
+                  c.fGroup.get('title')?.patchValue(data[index].className)
+                  c.fGroup.get('descr')?.patchValue(data[index].classDescription)
+              });
+              this.cards = almostCards
+          });
+      }
+    }
+    this.cards.forEach((c: CardData) => {
+      c.fGroup.valueChanges.subscribe(() => {
+        this.needToBeSaved.next(true)
+      });
+    });
+    this.subscriptions.push(this.needToBeSaved.subscribe((b: boolean) => {
+      if(b){
+        this.onSave(false)
+      }
+    }));
   }
 
 
-
   getFormControl(card: CardData, arg: string): FormControl {
-    return (card.fGroup.get(arg) as FormControl);
+    return (card.fGroup.get(arg) as FormControl) ?? new FormControl('');
   }
 
   getCardFormGroup(card: CardData): FormGroup {
@@ -89,7 +143,7 @@ export class RuleInputComponent {
 
   generateFgroup(){
     const fGroup : FormGroup = new FormGroup({
-      title: new FormControl<string>('DataType',[Validators.required, validateDataIdentifier, uniqueDataType(this.cards?.map(c => c.fGroup.get('title')?.value)||[])]),
+      title: new FormControl<string>('DataType',[Validators.required, validateDataIdentifier, uniqueDataType(  this.cards?.map(c => c.fGroup.get('title')?.value) || [] )]),
       descr: new FormControl<string>('DataType Descr',[]),
       dataType: new FormControl<string>('', [Validators.required]),
       dataIdentifier: new FormControl<string>('', [Validators.required, validateDataIdentifier])
@@ -99,7 +153,11 @@ export class RuleInputComponent {
 
   onClickAddCard() {
     const maxId : number = this.cards.length > 0 ? this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id : 0;
-    this.cards = [...this.cards, {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}]
+    let newCard = {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}
+    this.cards = [...this.cards, newCard]
+    newCard.fGroup.valueChanges.subscribe(() => {
+      this.needToBeSaved.next(true)
+    });
   }
 
 
@@ -114,5 +172,37 @@ export class RuleInputComponent {
     
   getDisplayedColumns(card: CardData): Iterable<string> {
     return card.readOnly ?  this.displayedColumns.filter(c => c !== 'toDelete') : this.displayedColumns
+  }
+
+  onSave(force:boolean = false) {
+    localStorage.setItem(LocalKeys.RULE_INPUT, JSON.stringify(this.cards.map((c: CardData) => {return {id: c.id,filteredOptions: c.filteredOptions, dataSource: c.dataSource}})))
+    localStorage.setItem(LocalKeys.RULE_INPUT_FORM_DATA, JSON.stringify(this.cards.map((c: CardData) => {return c.fGroup.value})))
+    if(force){
+      let payload : RuleInputRequestDTO[] = []
+      this.cards.forEach((c: CardData) => {
+        let item : RuleInputRequestDTO ={
+          projectId: parseInt(this.projectId!),
+          className: c.fGroup.get('title')?.value,
+          classDescription: c.fGroup.get('descr')?.value,
+          fields: c.dataSource?.map((d)=>{return{fieldName: d.dataIdentifier, fieldType: d.dataType}}) || []
+        }
+        payload.push(item)
+      })
+      this.designControllerService.addRuleInputData(payload).subscribe((res: PostedResourceDTO) => {
+        if(res.success){
+          console.log("Success")
+          this.needToBeSaved.next(false);
+        }
+      });
+    }
+
+  }
+
+
+  ngOnDestroy(): void {
+    this.needToBeSaved.complete()
+    this.subscriptions.forEach(s => s.unsubscribe())
+    localStorage.removeItem(LocalKeys.RULE_INPUT_FORM_DATA)
+    localStorage.removeItem(LocalKeys.RULE_INPUT)
   }
 }

@@ -11,6 +11,11 @@
     transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
+/* Main Content */
+.main-content {
+    flex: 1; /* Allow the main content to grow and take up available space */
+}
+
 /* Show state */
 .show {
     opacity: 1;

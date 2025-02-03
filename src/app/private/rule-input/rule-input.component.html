@@ -1,5 +1,6 @@
 <div class="cardControls">
-    <app-cta [class]="'smallMargin'" [msg]="'Add Card'" [isOutline]="true" (clicked)="onClickAddCard()"></app-cta>
+    <button mat-flat-button color="warn" [class]="'smallMargin'"  (click)="onClickAddCard()">Add Card</button>
+    <button *ngIf="needToBeSaved.asObservable() | async" mat-flat-button color="warn"  [class]="'smallMargin'" (click)="onSave(true)">Save </button>
 </div>
 <div class="cardContainer">
 
@@ -11,7 +12,7 @@
                     <mat-card-header>
                         <mat-card-title>
                             <div class="flex_row_center">
-                              <app-dynamic-form-field [fControl]="getFormControl(card, 'title')">
+                              <app-dynamic-form-field [fControl]="getFormControl(card, 'title')"  >
                               <ng-container>
                                   @if (getFormControl(card, 'title').hasError('required')) {
                                     <mat-error style="font-size: small">Title is <strong>required</strong></mat-error>

@@ -12,7 +12,9 @@ import {SettingsComponent} from "./private/settings/settings.component";
 
 export const LocalKeys = {
     AUTH_TOKEN: 'authToken',
-    LOGGED_USER: 'loggedUser'
+    LOGGED_USER: 'loggedUser',
+    RULE_INPUT: 'ruleInput',
+    RULE_INPUT_FORM_DATA: 'ruleInputFormData'
 }
 
 export const AppPaths = {

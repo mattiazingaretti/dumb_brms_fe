@@ -12,19 +12,21 @@ import {ProjectControllerService} from "../../api/api/projectController.service"
 import {ProjectDTO} from "../../api/model/projectDTO";
 import {PostedResourceDTO} from "../../api/model/postedResourceDTO";
 import {ProjectResponseDTO} from "../../api/model/projectResponseDTO";
+import {FooterComponent} from "../../shared/footer/footer.component";
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    CtaComponent,
-    MatTableModule,
-    MatButton,
-    MatIconButton,
-    MatIcon
-  ],
+    imports: [
+        CommonModule,
+        CtaComponent,
+        MatTableModule,
+        MatButton,
+        MatIconButton,
+        MatIcon,
+        FooterComponent
+    ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

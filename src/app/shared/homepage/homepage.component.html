@@ -1,74 +1,80 @@
 <div class="home-container">
-    <!-- Hero Section -->
-    <section id="hero" class="hero-section hide">
-        <div class="hero-content">
-            <h1>Welcome to Dynamic Rules</h1>
-            <p>Create custom rules and perform actions effortlessly with the power of AI-driven insights.</p>
-            @if (isLoggedIn){
-                <button mat-raised-button color="accent" routerLink="/dashboard">Start Designing Now</button>
-            } @else {
-                <button mat-raised-button color="accent" routerLink="/signup">Sign Up</button>
-            }
-        </div>
-    </section>
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section hide">
+            <div class="hero-content">
+                <h1>Welcome to Dynamic Rules</h1>
+                <p>Create custom rules and perform actions effortlessly with the power of AI-driven insights.</p>
+                @if (isLoggedIn){
+                    <button mat-raised-button color="accent" routerLink="/dashboard">Start Designing Now</button>
+                } @else {
+                    <button mat-raised-button color="accent" routerLink="/signup">Sign Up</button>
+                }
+            </div>
+        </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features-section hide">
-        <h2>Key Features</h2>
-        <div class="feature-cards">
-            <mat-card class="feature-card">
-                <mat-card-title>Custom Objects</mat-card-title>
-                <mat-card-content>
-                    <p>Create and customize your own objects tailored to your specific needs.</p>
-                    <p>Define properties, relationships, and behaviors to model real-world entities.</p>
-                </mat-card-content>
-            </mat-card>
-            <mat-card class="feature-card">
-                <mat-card-title>Dynamic Rules</mat-card-title>
-                <mat-card-content>
-                    <p>Easily define rules that govern how your objects interact and behave.</p>
-                    <p>Use a powerful rule editor to create complex logic without writing code.</p>
-                </mat-card-content>
-            </mat-card>
-            <mat-card class="feature-card">
-                <mat-card-title>Action Execution</mat-card-title>
-                <mat-card-content>
-                    <p>Perform automated actions based on defined rules and conditions.</p>
-                    <p>Trigger notifications, updates, or integrations with third-party systems.</p>
-                </mat-card-content>
-            </mat-card>
-        </div>
-    </section>
+        <!-- Features Section -->
+        <section id="features" class="features-section hide">
+            <h2>Key Features</h2>
+            <div class="feature-cards">
+                <mat-card class="feature-card">
+                    <mat-card-title>Custom Objects</mat-card-title>
+                    <mat-card-content>
+                        <p>Create and customize your own objects tailored to your specific needs.</p>
+                        <p>Define properties, relationships, and behaviors to model real-world entities.</p>
+                    </mat-card-content>
+                </mat-card>
+                <mat-card class="feature-card">
+                    <mat-card-title>Dynamic Rules</mat-card-title>
+                    <mat-card-content>
+                        <p>Easily define rules that govern how your objects interact and behave.</p>
+                        <p>Use a powerful rule editor to create complex logic without writing code.</p>
+                    </mat-card-content>
+                </mat-card>
+                <mat-card class="feature-card">
+                    <mat-card-title>Action Execution</mat-card-title>
+                    <mat-card-content>
+                        <p>Perform automated actions based on defined rules and conditions.</p>
+                        <p>Trigger notifications, updates, or integrations with third-party systems.</p>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </section>
 
-    <!-- GenAI Section -->
-    <section id="genai" class="genai-section hide">
-        <h2>Innovative Use of GenAI</h2>
-        <div class="genai-content">
-            <p>Our platform leverages Generative AI to enhance rule creation and object customization:</p>
-            <ul>
-                <li><strong>AI-Powered Rule Suggestions:</strong> Get intelligent suggestions for rules based on your data patterns.</li>
-                <li><strong>Automated Object Generation:</strong> Use natural language to describe objects, and let GenAI generate them for you.</li>
-                <li><strong>Context-Aware Actions:</strong> Automatically adapt actions based on contextual insights from GenAI models.</li>
-            </ul>
-        </div>
-    </section>
+        <!-- GenAI Section -->
+        <section id="genai" class="genai-section hide">
+            <h2>Innovative Use of GenAI</h2>
+            <div class="genai-content">
+                <p>Our platform leverages Generative AI to enhance rule creation and object customization:</p>
+                <ul>
+                    <li><strong>AI-Powered Rule Suggestions:</strong> Get intelligent suggestions for rules based on your data patterns.</li>
+                    <li><strong>Automated Object Generation:</strong> Use natural language to describe objects, and let GenAI generate them for you.</li>
+                    <li><strong>Context-Aware Actions:</strong> Automatically adapt actions based on contextual insights from GenAI models.</li>
+                </ul>
+            </div>
+        </section>
 
-    <!-- Key Customers Section -->
-    <section id="customers" class="customers-section hide">
-        <h2>Trusted by Leading Organizations</h2>
-        <div class="customer-logos">
-            <img src="../../../assets/placeholder.png" alt="Company A" class="customer-logo" />
-            <img src="../../../assets/placeholder.png" alt="Company B" class="customer-logo" />
-            <img src="../../../assets/placeholder.png" alt="Company C" class="customer-logo" />
-            <img src="../../../assets/placeholder.png" alt="Company D" class="customer-logo" />
-        </div>
-        <p>Our solutions are trusted by industry leaders across various sectors, including finance, healthcare, and technology.</p>
-    </section>
+        <!-- Key Customers Section -->
+        <section id="customers" class="customers-section hide">
+            <h2>Trusted by Leading Organizations</h2>
+            <div class="customer-logos">
+                <img src="../../../assets/placeholder.png" alt="Company A" class="customer-logo" />
+                <img src="../../../assets/placeholder.png" alt="Company B" class="customer-logo" />
+                <img src="../../../assets/placeholder.png" alt="Company C" class="customer-logo" />
+                <img src="../../../assets/placeholder.png" alt="Company D" class="customer-logo" />
+            </div>
+            <p>Our solutions are trusted by industry leaders across various sectors, including finance, healthcare, and technology.</p>
+        </section>
 
-    <!-- About Section -->
-    <section id="about" class="about-section hide">
-        <h2>About Us</h2>
-        <p>We are dedicated to providing powerful tools for creating dynamic rules and performing actions on customized objects.</p>
-        <p>With a focus on innovation and customer success, we empower businesses to automate workflows and drive efficiency.</p>
-    </section>
+        <!-- About Section -->
+        <section id="about" class="about-section hide">
+            <h2>About Us</h2>
+            <p>We are dedicated to providing powerful tools for creating dynamic rules and performing actions on customized objects.</p>
+            <p>With a focus on innovation and customer success, we empower businesses to automate workflows and drive efficiency.</p>
+        </section>
+    </div>
+
+
+    <app-footer></app-footer>
+
 </div>

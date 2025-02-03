@@ -1,5 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ElementRef, ViewChild, Component, Input, ViewChildren, QueryList, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  AfterViewInit,
+  ElementRef,
+  ViewChild,
+  Component,
+  Input,
+  ViewChildren,
+  QueryList,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Output, EventEmitter
+} from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -19,6 +30,7 @@ export class DynamicFormFieldComponent {
   isEdit: boolean = false;
 
   @Input() fControl?: FormControl<any> = new FormControl();
+  @Output() changed: EventEmitter<any> = new EventEmitter();
 
   @ViewChild('myInput') myInput!: ElementRef<HTMLInputElement> ;
 
@@ -43,4 +55,9 @@ export class DynamicFormFieldComponent {
     this.cd.detectChanges(); //Otherwhise we cannot detect the change in the dom for the ngif
     this.myInput.nativeElement.focus();
   }
+
+  onChange($event: Event) {
+    this.changed.emit($event);
+  }
+
 }

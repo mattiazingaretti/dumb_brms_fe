@@ -4,7 +4,7 @@
     
         <mat-form-field  (focusout)="onFocusOut()" >
             <mat-label>First name</mat-label>
-            <input matInput [formControl]="fControl!" #myInput >
+            <input matInput [formControl]="fControl!" #myInput (change)="onChange($event)">
             <!-- Error handling template for form control -->
             <ng-content></ng-content>
         </mat-form-field>

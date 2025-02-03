@@ -7,19 +7,22 @@ import { Component } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import {AsyncPipe, NgForOf} from "@angular/common";
 
 @Component({
   selector: 'app-rule-design-when',
   standalone: true,
-  imports: [
-    MatButtonModule,
-    MatStepperModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatAutocompleteModule,
-  ],
+    imports: [
+        MatButtonModule,
+        MatStepperModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatAutocompleteModule,
+        NgForOf,
+        AsyncPipe,
+    ],
   templateUrl: './rule-design-when.component.html',
   styleUrls: ['./rule-design-when.component.css'],
 })

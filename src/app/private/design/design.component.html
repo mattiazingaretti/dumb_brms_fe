@@ -1,37 +1,42 @@
+<div class="home-container">
+    <div class="main-content">
+        <div class="main_container">
+            <div class="inner_container">
+                <mat-tab-group>
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon" >rule</mat-icon>
+                        </ng-template>
+                        <div class="rd_container">
+                            <div class="rd_inner_container">
+                                <app-rule-design></app-rule-design>
+                            </div>
+                        </div>
 
-<div class="main_container">
-    <div class="inner_container">
-        <mat-tab-group>
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon" >rule</mat-icon>
-              </ng-template>
-              <div class="rd_container">
-                <div class="rd_inner_container">   
-                    <app-rule-design></app-rule-design>  
-                </div>
-              </div>
-               
-            </mat-tab>
-          
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon">input</mat-icon>
-                 Input 
-              </ng-template>
-                <app-rule-input></app-rule-input>
-            </mat-tab>
-          
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon">output</mat-icon>
-                 Output 
-              </ng-template>
-                <app-rule-output></app-rule-output>
-            </mat-tab>
-          </mat-tab-group>
-        
+                    </mat-tab>
+
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">input</mat-icon>
+                            Input
+                        </ng-template>
+                        <app-rule-input></app-rule-input>
+                    </mat-tab>
+
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">output</mat-icon>
+                            Output
+                        </ng-template>
+                        <app-rule-output></app-rule-output>
+                    </mat-tab>
+                </mat-tab-group>
+
+            </div>
+
+        </div>
     </div>
-        
+
+    <app-footer></app-footer>
 </div>
-  
+

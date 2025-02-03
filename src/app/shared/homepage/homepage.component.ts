@@ -4,6 +4,7 @@ import {MatCard, MatCardContent, MatCardTitle} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
 import {RouterLink} from "@angular/router";
 import {AuthService} from "../services/auth.service";
+import {FooterComponent} from "../footer/footer.component";
 
 
 @Component({
@@ -15,7 +16,8 @@ import {AuthService} from "../services/auth.service";
     MatButton,
     MatCardTitle,
     MatCardContent,
-    RouterLink
+    RouterLink,
+    FooterComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
