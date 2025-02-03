@@ -17,6 +17,7 @@ import { HttpClient, HttpHeaders, HttpParams,
 import { Observable }                                        from 'rxjs';
 
 import { PostedResourceDTO } from '../model/postedResourceDTO';
+import { RuleDataTypesDTO } from '../model/ruleDataTypesDTO';
 import { RuleInputRequestDTO } from '../model/ruleInputRequestDTO';
 import { RuleInputResponseDTO } from '../model/ruleInputResponseDTO';
 import { RuleOutputRequestDTO } from '../model/ruleOutputRequestDTO';
@@ -144,6 +145,42 @@ export class DesignControllerService {
         return this.httpClient.request<PostedResourceDTO>('post',`${this.basePath}/design/addRuleOutputData`,
             {
                 body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getDataTypes(observe?: 'body', reportProgress?: boolean): Observable<Array<RuleDataTypesDTO>>;
+    public getDataTypes(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<RuleDataTypesDTO>>>;
+    public getDataTypes(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<RuleDataTypesDTO>>>;
+    public getDataTypes(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<Array<RuleDataTypesDTO>>('get',`${this.basePath}/design/getDataTypes`,
+            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

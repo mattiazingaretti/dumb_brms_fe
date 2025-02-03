@@ -1,6 +1,6 @@
 import {CtaComponent} from './../../shared/cta/cta.component';
 import {MatInputModule} from '@angular/material/input';
-import {Component, ElementRef, QueryList, ViewChildren} from '@angular/core';
+import {Component, ElementRef, Input, QueryList, ViewChildren} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
@@ -20,6 +20,7 @@ import {ActivatedRoute} from "@angular/router";
 import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseDTO";
 import {RuleInputRequestDTO} from "../../api/model/ruleInputRequestDTO";
 import {PostedResourceDTO} from "../../model/postedResourceDTO";
+import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
 
 
 export interface CardData {
@@ -43,7 +44,7 @@ export class RuleInputComponent {
   subscriptions: Subscription[] = [];
   needToBeSaved: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
+  @Input() options: string[] = []//['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
 
   cards: CardData[] = []
 
@@ -57,7 +58,6 @@ export class RuleInputComponent {
       public designControllerService: DesignControllerService,
       private route: ActivatedRoute
   ){
-
   }
 
   ngOnInit(): void {

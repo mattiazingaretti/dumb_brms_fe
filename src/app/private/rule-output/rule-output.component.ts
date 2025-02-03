@@ -1,4 +1,4 @@
-import {Component, ElementRef, QueryList, ViewChildren} from '@angular/core';
+import {Component, ElementRef, Input, QueryList, ViewChildren} from '@angular/core';
 import {AsyncPipe, NgIf} from "@angular/common";
 import {CtaComponent} from "../../shared/cta/cta.component";
 import {DynamicFormFieldComponent} from "../../shared/dynamic-form-field/dynamic-form-field.component";
@@ -30,6 +30,7 @@ import {CardData} from "../rule-input/rule-input.component";
 import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
 import {RuleOutputRequestDTO} from "../../api/model/ruleOutputRequestDTO";
 import {RuleOutputFieldResponseDTO} from "../../api/model/ruleOutputFieldResponseDTO";
+import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
 
 @Component({
   selector: 'app-rule-output',
@@ -74,7 +75,7 @@ export class RuleOutputComponent {
     subscriptions: Subscription[] = [];
     needToBeSaved: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-    options: string[] = ['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
+    @Input() options: string[] = []//['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
 
     cards: CardData[] = []
 
@@ -88,7 +89,6 @@ export class RuleOutputComponent {
         public designControllerService: DesignControllerService,
         private route: ActivatedRoute
     ){
-
     }
 
     ngOnInit(): void {

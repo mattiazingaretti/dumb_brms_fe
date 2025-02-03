@@ -6,6 +6,8 @@ import { RuleDesignComponent } from '../rule-design/rule-design.component';
 import { RuleInputComponent } from '../rule-input/rule-input.component';
 import { RuleOutputComponent } from '../rule-output/rule-output.component';
 import {FooterComponent} from "../../shared/footer/footer.component";
+import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
+import {DesignControllerService} from "../../api/api/designController.service";
 
 
 @Component({
@@ -18,10 +20,18 @@ import {FooterComponent} from "../../shared/footer/footer.component";
 export class DesignComponent {
 
   idProject?: string
+  dataTypes: string[] = [];
 
-  constructor(public route : ActivatedRoute){
+  constructor(
+      public route : ActivatedRoute,
+      public  designControllerService: DesignControllerService
+  ){
     this.route.queryParams.subscribe((params: {[key: string]: any})=>{
         this.idProject = params['id'] 
+    });
+
+    this.designControllerService.getDataTypes().subscribe((data: RuleDataTypesDTO[]) => {
+      this.dataTypes = data.map(d => d.dataType ?? '')
     });
   }
 

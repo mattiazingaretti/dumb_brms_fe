@@ -20,7 +20,7 @@
                             <mat-icon class="example-tab-icon">input</mat-icon>
                             Input
                         </ng-template>
-                        <app-rule-input></app-rule-input>
+                        <app-rule-input [options]="dataTypes"></app-rule-input>
                     </mat-tab>
 
                     <mat-tab>
@@ -28,7 +28,7 @@
                             <mat-icon class="example-tab-icon">output</mat-icon>
                             Output
                         </ng-template>
-                        <app-rule-output></app-rule-output>
+                        <app-rule-output [options]="dataTypes"></app-rule-output>
                     </mat-tab>
                 </mat-tab-group>
 
