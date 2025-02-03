@@ -52,9 +52,9 @@ export class DashboardComponent implements OnInit{
   }
 
 
-  onClick(element: any){
+  onClick(element: ProjectResponseDTO){
     this.router.navigate([AppPaths.DESIGN_BOARD], {
-      queryParams: {id: element.idProject}
+      queryParams: {id: element.id}
     })
   }
 

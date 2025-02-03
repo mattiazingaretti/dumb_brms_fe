@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomepageComponent } from './public/homepage/homepage.component';
+import { HomepageComponent } from './shared/homepage/homepage.component';
 import { DocsComponent } from './public/docs/docs.component';
 import { LoginComponent } from './public/login/login.component';
 import { FeaturesComponent } from './public/features/features.component';
