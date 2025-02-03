@@ -1,0 +1,44 @@
+
+.cardContainer{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.card{
+    display: flex;
+    margin: 10px;
+}
+
+.ruleInputTable {
+    margin: 10px 0px 24px
+}
+.smallMargin{
+    margin: 10px 10px 10px 10px;
+}
+.example-card{
+    /*min-height: ; !* Set a minimum height for the card *!*/
+    min-width: 600px; /* Set a minimum height for the card */
+    max-width: 100%; /* Ensure the card does not exceed the container width */
+}
+
+.dataInputClassContainer{
+    padding: 10px;
+}
+.dataInputClass{
+    padding: 5px;
+}
+
+.ruleInputActions{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cardControls{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}

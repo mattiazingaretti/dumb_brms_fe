@@ -19,6 +19,8 @@ import { Observable }                                        from 'rxjs';
 import { PostedResourceDTO } from '../model/postedResourceDTO';
 import { RuleInputRequestDTO } from '../model/ruleInputRequestDTO';
 import { RuleInputResponseDTO } from '../model/ruleInputResponseDTO';
+import { RuleOutputRequestDTO } from '../model/ruleOutputRequestDTO';
+import { RuleOutputResponseDTO } from '../model/ruleOutputResponseDTO';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -106,6 +108,53 @@ export class DesignControllerService {
     /**
      * 
      * 
+     * @param body 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public addRuleOutputData(body: Array<RuleOutputRequestDTO>, observe?: 'body', reportProgress?: boolean): Observable<PostedResourceDTO>;
+    public addRuleOutputData(body: Array<RuleOutputRequestDTO>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PostedResourceDTO>>;
+    public addRuleOutputData(body: Array<RuleOutputRequestDTO>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PostedResourceDTO>>;
+    public addRuleOutputData(body: Array<RuleOutputRequestDTO>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling addRuleOutputData.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.request<PostedResourceDTO>('post',`${this.basePath}/design/addRuleOutputData`,
+            {
+                body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
      * @param projectId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -135,6 +184,47 @@ export class DesignControllerService {
         ];
 
         return this.httpClient.request<Array<RuleInputResponseDTO>>('get',`${this.basePath}/design/getRuleInputData/${encodeURIComponent(String(projectId))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getRuleOutputData(projectId: number, observe?: 'body', reportProgress?: boolean): Observable<Array<RuleOutputResponseDTO>>;
+    public getRuleOutputData(projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<RuleOutputResponseDTO>>>;
+    public getRuleOutputData(projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<RuleOutputResponseDTO>>>;
+    public getRuleOutputData(projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling getRuleOutputData.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<Array<RuleOutputResponseDTO>>('get',`${this.basePath}/design/getRuleOutputData/${encodeURIComponent(String(projectId))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

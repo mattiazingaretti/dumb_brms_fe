@@ -14,7 +14,9 @@ export const LocalKeys = {
     AUTH_TOKEN: 'authToken',
     LOGGED_USER: 'loggedUser',
     RULE_INPUT: 'ruleInput',
-    RULE_INPUT_FORM_DATA: 'ruleInputFormData'
+    RULE_OUTPUT: 'ruleOutput',
+    RULE_INPUT_FORM_DATA: 'ruleInputFormData',
+    RULE_OUTPUT_FORM_DATA: 'ruleOutputFormData'
 }
 
 export const AppPaths = {
