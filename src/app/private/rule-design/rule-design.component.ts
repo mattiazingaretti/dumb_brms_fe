@@ -12,22 +12,30 @@ import { CtaComponent } from '../../shared/cta/cta.component';
 import {  MatDialog} from '@angular/material/dialog';
 import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.component';
 import { RuleDesignWhenComponent } from "../rule-design-when/rule-design-when.component";
+import {LocalKeys} from "../../app.routes";
+import {RuleDesignThenComponent} from "../rule-design-then/rule-design-then.component";
 
 
-export interface Actions{
-
+interface Rule {
+  idRule: number;
+  ruleName: string;
+  conditions: Condition[];
+  actions: Action[];
 }
 
-export interface Conditions{
-
+interface Condition {
+  class?: string;
+  field?: string;
+  operator?: string;
+  value?: any;
 }
 
-export interface Rule{
-  idRule: number,
-  ruleName: string ,
-  conditions: Conditions[]
-  actions: Actions[]
+interface Action {
+  class?: string;
+  field?: string;
+  value?: any;
 }
+
 
 @Component({
   selector: 'app-rule-design',
@@ -43,31 +51,74 @@ export interface Rule{
     MatDatepickerModule,
     MatSlideToggleModule,
     CtaComponent,
-    RuleDesignWhenComponent
-],
+    RuleDesignWhenComponent,
+    RuleDesignThenComponent
+  ],
   templateUrl: './rule-design.component.html',
   styleUrl: './rule-design.component.css'
 })
 export class RuleDesignComponent {
   @ViewChild(MatAccordion) accordion?: MatAccordion;
+  rules: Rule[] = [];
+  availableClasses: any[] = [];
 
-  rules: Rule[] = [{idRule: 1, ruleName: "TestRuleName", conditions: [], actions: []}]
+  constructor(public dialog: MatDialog) {}
 
-  constructor(public dialog: MatDialog){
-
+  ngOnInit() {
+    this.loadAvailableClasses();
+    this.loadSavedRules();
   }
 
-  addRule(){
-    const dialogRef = this.dialog.open(DesignDialogComponent, {data: {ruleName: ""}});
+  private loadAvailableClasses() {
+    const ruleInput = localStorage.getItem(LocalKeys.RULE_INPUT);
+    const ruleFormData = localStorage.getItem(LocalKeys.RULE_INPUT_FORM_DATA);
+
+    if (ruleInput && ruleFormData) {
+      const inputCards = JSON.parse(ruleInput);
+      const formDataArray = JSON.parse(ruleFormData);
+
+      this.availableClasses = inputCards.map((card: any, index: number) => ({
+        title: formDataArray[index]?.title || `Class ${index + 1}`,
+        fields: card.dataSource.map((field: any) => ({
+          identifier: field.dataIdentifier,
+          type: field.dataType
+        }))
+      }));
+    }
+  }
+
+  private loadSavedRules() {
+    const savedRules = localStorage.getItem(LocalKeys.RULES);
+    if (savedRules) {
+      this.rules = JSON.parse(savedRules);
+    }
+  }
+
+  addRule() {
+    const dialogRef = this.dialog.open(DesignDialogComponent, {
+      data: { ruleName: "" },
+      width: '400px'
+    });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if(!result.isOk){
-        console.error("Something went wrong");
-        return
+      if (result?.isOk && !result?.isCanceled) {
+        const newRule: Rule = {
+          idRule: this.rules.length + 1,
+          ruleName: result.ruleName,
+          conditions: [],
+          actions: []
+        };
+        this.rules = [...this.rules, newRule];
+        this.saveRules();
       }
-      if(result.isCanceled)
-        return
-      this.rules.push({idRule: this.rules.length+1, ruleName: result.ruleName , conditions: [] , actions: []})
     });
+  }
+
+  private saveRules() {
+    localStorage.setItem(LocalKeys.RULES, JSON.stringify(this.rules));
+  }
+
+  onRulesChange() {
+    this.saveRules();
   }
 }

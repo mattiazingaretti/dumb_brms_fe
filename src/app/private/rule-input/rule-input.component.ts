@@ -13,14 +13,13 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {CommonModule} from "@angular/common";
 import {LocalKeys} from "../../app.routes";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {BehaviorSubject, debounce, debounceTime, Subscription} from "rxjs";
 import {DesignControllerService} from "../../api/api/designController.service";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {ActivatedRoute} from "@angular/router";
 import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseDTO";
 import {RuleInputRequestDTO} from "../../api/model/ruleInputRequestDTO";
 import {PostedResourceDTO} from "../../model/postedResourceDTO";
-import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
 
 
 export interface CardData {
@@ -60,6 +59,22 @@ export class RuleInputComponent {
   ){
   }
 
+  updateSubscriptions(){
+    this.subscriptions.push(this.needToBeSaved.subscribe((b: boolean) => {
+      if(b){
+        this.onSave(false)
+        console.log("saving without forcing")
+      }
+    }));
+    this.cards.forEach((c: CardData) => {
+      this.subscriptions.push(c.fGroup.valueChanges.pipe(debounceTime(300)).subscribe((val) => {
+        this.needToBeSaved.next(true)
+        console.log("need to be saved")
+        console.log(val)
+      }));
+    });
+  }
+
   ngOnInit(): void {
     this.projectId = this.route.snapshot.queryParamMap.get('id');
     if(this.projectId == null){
@@ -77,6 +92,7 @@ export class RuleInputComponent {
         c.fGroup.patchValue(ruleInputFormJson[index])
       })
       this.cards = almostCards
+      this.updateSubscriptions()
     }else{
         if(this.projectId != null){
           this.designControllerService.getRuleInputData(parseInt(this.projectId!)).subscribe((data: RuleInputResponseDTO[]) => {
@@ -89,19 +105,12 @@ export class RuleInputComponent {
                   c.fGroup.get('descr')?.patchValue(data[index].classDescription)
               });
               this.cards = almostCards
+            this.updateSubscriptions()
           });
       }
     }
-    this.cards.forEach((c: CardData) => {
-      c.fGroup.valueChanges.subscribe(() => {
-        this.needToBeSaved.next(true)
-      });
-    });
-    this.subscriptions.push(this.needToBeSaved.subscribe((b: boolean) => {
-      if(b){
-        this.onSave(false)
-      }
-    }));
+
+
   }
 
 
@@ -155,21 +164,23 @@ export class RuleInputComponent {
     const maxId : number = this.cards.length > 0 ? this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id : 0;
     let newCard = {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}
     this.cards = [...this.cards, newCard]
-    newCard.fGroup.valueChanges.subscribe(() => {
-      this.needToBeSaved.next(true)
-    });
+    this.updateSubscriptions()
+    // newCard.fGroup.valueChanges.subscribe(() => {
+    //   this.needToBeSaved.next(true)
+    // });
   }
 
 
   onDeleteCard(card: CardData) {
     this.cards = [...this.cards.filter(c => c.id != card.id)]
+    this.updateSubscriptions()
   }
 
   onDeleteCardField(card: CardData,cardField:  {dataIdentifier: string, dataType: string}) {
     card.dataSource = card.dataSource.length > 0 ?  card.dataSource.filter(d => d.dataIdentifier !== cardField.dataIdentifier || d.dataType !== cardField.dataType) : []
     card.dataSource  = [...card.dataSource]
   }
-    
+
   getDisplayedColumns(card: CardData): Iterable<string> {
     return card.readOnly ?  this.displayedColumns.filter(c => c !== 'toDelete') : this.displayedColumns
   }

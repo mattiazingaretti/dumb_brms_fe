@@ -1,27 +1,38 @@
 <div>
-    <div class="example-action-buttons">    
+    <div class="example-action-buttons">
         <div style="display: flex;">
-            <app-cta class="actions_inner" [iconName]="'expand'"  [isOutline]="true" (clicked)="accordion!.openAll()"></app-cta>
-            <app-cta class="actions_inner" [iconName]="'close_fullscreen'" [isOutline]="true" (clicked)="accordion!.closeAll()"></app-cta>
+            <app-cta class="actions_inner" [iconName]="'expand'" [isOutline]="true"
+                     (clicked)="accordion!.openAll()"></app-cta>
+            <app-cta class="actions_inner" [iconName]="'close_fullscreen'" [isOutline]="true"
+                     (clicked)="accordion!.closeAll()"></app-cta>
         </div>
-        <app-cta class="actions_inner" [iconName]="'add'"  [isOutline]="true" (clicked)="addRule()"></app-cta>
+        <app-cta class="actions_inner" [iconName]="'add'" [isOutline]="true"
+                 (clicked)="addRule()"></app-cta>
     </div>
-      <mat-accordion *ngFor="let panel of rules" class="example-headers-align" multi>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header >
-            <mat-panel-title>
-              ID: {{panel.idRule}}
-            </mat-panel-title>
-            <mat-panel-description class="header_style">
-              {{panel.ruleName}}
-              <mat-slide-toggle></mat-slide-toggle>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
 
-          <!-- WHEN Section -->
-          <app-rule-design-when></app-rule-design-when>
-          <!-- THEN Section -->
+    <mat-accordion class="example-headers-align" multi>
+        <mat-expansion-panel *ngFor="let rule of rules">
+            <mat-expansion-panel-header>
+                <mat-panel-title>ID: {{ rule.idRule }}</mat-panel-title>
+                <mat-panel-description class="header_style">
+                    {{ rule.ruleName }}
+                    <mat-slide-toggle></mat-slide-toggle>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <!-- WHEN Section -->
+            <app-rule-design-when
+                    [availableClasses]="availableClasses"
+                    [(conditions)]="rule.conditions"
+                    (conditionsChange)="onRulesChange()">
+            </app-rule-design-when>
+
+            <!-- THEN Section -->
+            <app-rule-design-then
+                    [availableClasses]="availableClasses"
+                    [(actions)]="rule.actions"
+                    (actionsChange)="onRulesChange()">
+            </app-rule-design-then>
         </mat-expansion-panel>
-      </mat-accordion>
-    
+    </mat-accordion>
 </div>

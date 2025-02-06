@@ -15,6 +15,7 @@ export const LocalKeys = {
     LOGGED_USER: 'loggedUser',
     RULE_INPUT: 'ruleInput',
     RULE_OUTPUT: 'ruleOutput',
+    RULES: 'rules',
     RULE_INPUT_FORM_DATA: 'ruleInputFormData',
     RULE_OUTPUT_FORM_DATA: 'ruleOutputFormData'
 }

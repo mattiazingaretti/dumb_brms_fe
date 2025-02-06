@@ -1,49 +1,45 @@
-
-  <mat-stepper orientation="vertical" [linear]="true" #stepper>
-    <mat-step [stepControl]="firstFormGroup">
-        <form [formGroup]="firstFormGroup">
-          <ng-template matStepLabel>When</ng-template>
-          <mat-form-field>
-            <mat-label>Class Name</mat-label>
-            <input
-              type="text"
-              matInput
-              formControlName="firstCtrl"
-              [matAutocomplete]="auto"
-              placeholder="Last name, First name"
-              required
-            >
-            <mat-autocomplete #auto="matAutocomplete">
-              <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-          <div>
-            <button mat-button matStepperNext [disabled]="!firstFormGroup.valid">Next</button>
-          </div>
-        </form>
-      </mat-step>
-    <mat-step [stepControl]="secondFormGroup">
-      <form [formGroup]="secondFormGroup">
-        <ng-template matStepLabel>Fill out your address</ng-template>
+<div class="condition-container">
+    <div *ngFor="let condition of conditions; let i = index" class="condition-row">
         <mat-form-field>
-          <mat-label>Address</mat-label>
-          <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
-                 required>
+            <mat-label>Class</mat-label>
+            <mat-select [(ngModel)]="condition.class" (ngModelChange)="conditionsChange.emit(conditions)">
+                <mat-option *ngFor="let cls of availableClasses" [value]="cls.title">
+                    {{ cls.title }}
+                </mat-option>
+            </mat-select>
         </mat-form-field>
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext>Next</button>
-        </div>
-      </form>
-    </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Done</ng-template>
-      <p>You are now done.</p>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button (click)="stepper.reset()">Reset</button>
-      </div>
-    </mat-step>
-  </mat-stepper>
+
+        <mat-form-field *ngIf="condition.class">
+            <mat-label>Field</mat-label>
+            <mat-select [(ngModel)]="condition.field" (ngModelChange)="conditionsChange.emit(conditions)">
+                <mat-option *ngFor="let field of getClassFields(condition.class) ; trackBy: trackByField"
+                            [value]="field.identifier">
+                    {{ field.identifier }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="condition.field">
+            <mat-label>Operator</mat-label>
+            <mat-select [(ngModel)]="condition.operator" (ngModelChange)="conditionsChange.emit(conditions)">
+                <mat-option *ngFor="let op of operators" [value]="op">
+                    {{ op }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="condition.operator">
+            <input matInput [(ngModel)]="condition.value"
+                   (ngModelChange)="conditionsChange.emit(conditions)"
+                   placeholder="Value">
+        </mat-form-field>
+
+        <button mat-icon-button color="warn" (click)="removeCondition(i)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+
+    <button mat-stroked-button (click)="addCondition()">
+        <mat-icon>add</mat-icon> Add Condition
+    </button>
+</div>

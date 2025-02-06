@@ -1,1 +1,37 @@
-<p>rule-design-then works!</p>
+<!-- rule-design-then.component.html -->
+<div class="action-container">
+    <div *ngFor="let action of actions; let i = index" class="action-row">
+        <mat-form-field>
+            <mat-label>Class</mat-label>
+            <mat-select [(ngModel)]="action.class" (ngModelChange)="actionsChange.emit(actions)">
+                <mat-option *ngFor="let cls of availableClasses" [value]="cls.title">
+                    {{ cls.title }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="action.class">
+            <mat-label>Field</mat-label>
+            <mat-select [(ngModel)]="action.field" (ngModelChange)="actionsChange.emit(actions)">
+                <mat-option *ngFor="let field of getClassFields(action.class)"
+                            [value]="field.identifier">
+                    {{ field.identifier }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="action.field">
+            <input matInput [(ngModel)]="action.value"
+                   (ngModelChange)="actionsChange.emit(actions)"
+                   placeholder="Value">
+        </mat-form-field>
+
+        <button mat-icon-button color="warn" (click)="removeAction(i)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+
+    <button mat-stroked-button (click)="addAction()">
+        <mat-icon>add</mat-icon> Add Action
+    </button>
+</div>

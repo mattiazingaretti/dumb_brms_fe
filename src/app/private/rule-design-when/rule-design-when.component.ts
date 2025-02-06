@@ -1,13 +1,15 @@
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, FormGroup} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatFormFieldModule, MatLabel} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
 import {MatButtonModule} from '@angular/material/button';
-import { Component } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import {AsyncPipe, NgForOf} from "@angular/common";
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {MatIcon} from "@angular/material/icon";
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-rule-design-when',
@@ -15,6 +17,7 @@ import {AsyncPipe, NgForOf} from "@angular/common";
     imports: [
         MatButtonModule,
         MatStepperModule,
+        MatLabel,
         FormsModule,
         ReactiveFormsModule,
         MatFormFieldModule,
@@ -22,35 +25,40 @@ import {AsyncPipe, NgForOf} from "@angular/common";
         MatAutocompleteModule,
         NgForOf,
         AsyncPipe,
+        MatIcon,
+        MatSelect,
+        NgIf,
     ],
   templateUrl: './rule-design-when.component.html',
   styleUrls: ['./rule-design-when.component.css'],
 })
 export class RuleDesignWhenComponent {
-  firstFormGroup: FormGroup;
-  secondFormGroup: FormGroup;
+    @Input() availableClasses: any[] = [];
+    @Input() conditions: any[] = [];
+    @Output() conditionsChange = new EventEmitter<any[]>();
 
-  options: string[] = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Brown'];
+    operators = ['equals', 'not equals', 'greater than', 'less than'];
 
-  filteredOptions: Observable<string[]> = of([]);
+    addCondition() {
+        this.conditions = [...this.conditions, {}];
+        this.conditionsChange.emit(this.conditions);
+    }
 
-  constructor(private _formBuilder: FormBuilder) {
-    this.firstFormGroup = this._formBuilder.group({
-      firstCtrl: ['', Validators.required],
-    });
+    removeCondition(index: number) {
+        this.conditions.splice(index, 1);
+        this.conditionsChange.emit(this.conditions);
+    }
 
-    this.secondFormGroup = this._formBuilder.group({
-      secondCtrl: ['', Validators.required],
-    });
+    trackByField(index: number, field: any): string {
+        return field.identifier;
+    }
 
-    this.filteredOptions = this.firstFormGroup.get('firstCtrl')!.valueChanges.pipe(
-      startWith(''), 
-      map(value => this._filter(value || '')) 
-    );
-  }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
-  }
+    trackByFn(index: number) {
+        return index;
+    }
+    getClassFields(className: string): any[] {
+        if (!className) return [];
+        const selectedClass = this.availableClasses.find(c => c.title === className);
+        return selectedClass?.fields || [];
+    }
 }
