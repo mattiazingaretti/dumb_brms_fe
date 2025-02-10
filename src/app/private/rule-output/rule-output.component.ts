@@ -31,6 +31,7 @@ import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
 import {RuleOutputRequestDTO} from "../../api/model/ruleOutputRequestDTO";
 import {RuleOutputFieldResponseDTO} from "../../api/model/ruleOutputFieldResponseDTO";
 import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
+import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 
 @Component({
   selector: 'app-rule-output',
@@ -87,6 +88,7 @@ export class RuleOutputComponent {
 
     constructor(
         public designControllerService: DesignControllerService,
+        public ruleDesignDataSharingService: RuleDesignDataSharingService,
         private route: ActivatedRoute
     ){
     }
@@ -221,8 +223,8 @@ export class RuleOutputComponent {
             })
             this.designControllerService.addRuleOutputData(payload).subscribe((res: PostedResourceDTO) => {
                 if(res.success){
-                    console.log("Success")
                     this.needToBeSaved.next(false);
+                    this.ruleDesignDataSharingService.setDataRefresh(true);
                 }
             });
         }

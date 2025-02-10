@@ -14,6 +14,7 @@ import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.co
 import { RuleDesignWhenComponent } from "../rule-design-when/rule-design-when.component";
 import {LocalKeys} from "../../app.routes";
 import {RuleDesignThenComponent} from "../rule-design-then/rule-design-then.component";
+import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 
 
 interface Rule {
@@ -62,11 +63,19 @@ export class RuleDesignComponent {
   rules: Rule[] = [];
   availableClasses: any[] = [];
 
-  constructor(public dialog: MatDialog) {}
+  constructor(
+      public dialog: MatDialog,
+      public ruleDesignDataSharingService: RuleDesignDataSharingService
+  ) {}
 
   ngOnInit() {
     this.loadAvailableClasses();
     this.loadSavedRules();
+    this.ruleDesignDataSharingService.isRefreshDataNeeded().subscribe((flg)=>{
+      if(flg){
+        this.loadAvailableClasses()
+      }
+    })
   }
 
   private loadAvailableClasses() {
@@ -120,5 +129,9 @@ export class RuleDesignComponent {
 
   onRulesChange() {
     this.saveRules();
+  }
+
+  ngOnDestroy() {
+    this.ruleDesignDataSharingService.completeRefreshData()
   }
 }

@@ -20,6 +20,7 @@ import {ActivatedRoute} from "@angular/router";
 import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseDTO";
 import {RuleInputRequestDTO} from "../../api/model/ruleInputRequestDTO";
 import {PostedResourceDTO} from "../../model/postedResourceDTO";
+import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 
 
 export interface CardData {
@@ -55,6 +56,7 @@ export class RuleInputComponent {
 
   constructor(
       public designControllerService: DesignControllerService,
+      public ruleDesignDataSharingService: RuleDesignDataSharingService,
       private route: ActivatedRoute
   ){
   }
@@ -201,8 +203,8 @@ export class RuleInputComponent {
       })
       this.designControllerService.addRuleInputData(payload).subscribe((res: PostedResourceDTO) => {
         if(res.success){
-          console.log("Success")
           this.needToBeSaved.next(false);
+          this.ruleDesignDataSharingService.setDataRefresh(true);
         }
       });
     }

@@ -1,13 +1,10 @@
 <div>
     <div class="example-action-buttons">
         <div style="display: flex;">
-            <app-cta class="actions_inner" [iconName]="'expand'" [isOutline]="true"
-                     (clicked)="accordion!.openAll()"></app-cta>
-            <app-cta class="actions_inner" [iconName]="'close_fullscreen'" [isOutline]="true"
-                     (clicked)="accordion!.closeAll()"></app-cta>
+            <button  mat-mini-fab color="warn"  (click)="accordion!.openAll()"><mat-icon>expand</mat-icon></button>
+            <button  mat-mini-fab color="warn" (click)="accordion!.closeAll()"><mat-icon>close_fullscreen</mat-icon></button>
         </div>
-        <app-cta class="actions_inner" [iconName]="'add'" [isOutline]="true"
-                 (clicked)="addRule()"></app-cta>
+        <button  mat-mini-fab color="warn" (click)="addRule()"><mat-icon>add</mat-icon></button>
     </div>
 
     <mat-accordion class="example-headers-align" multi>
