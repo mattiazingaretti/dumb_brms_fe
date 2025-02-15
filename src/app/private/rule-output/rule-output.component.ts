@@ -20,7 +20,7 @@ import {
 import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {BehaviorSubject, debounceTime, Observable, Subscription} from "rxjs";
 import {DesignControllerService} from "../../api/api/designController.service";
 import {ActivatedRoute} from "@angular/router";
 import {LocalKeys} from "../../app.routes";
@@ -32,6 +32,9 @@ import {RuleOutputRequestDTO} from "../../api/model/ruleOutputRequestDTO";
 import {RuleOutputFieldResponseDTO} from "../../api/model/ruleOutputFieldResponseDTO";
 import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
+import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
+import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseDTO";
+import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
 
 @Component({
   selector: 'app-rule-output',
@@ -77,6 +80,7 @@ export class RuleOutputComponent {
     needToBeSaved: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     @Input() options: string[] = []//['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
+    @Input() ruleData?: Observable<RuleDataResponseDTO>
 
     cards: CardData[] = []
 
@@ -110,31 +114,55 @@ export class RuleOutputComponent {
                 c.fGroup.patchValue(ruleInputFormJson[index])
             })
             this.cards = almostCards
+            this.updateSubscriptions()
         }else{
-            if(this.projectId != null){
-                this.designControllerService.getRuleOutputData(parseInt(this.projectId!)).subscribe((data: RuleOutputResponseDTO[]) => {
-                    let almostCards :any = data.map((c: RuleOutputResponseDTO , i: number) =>{
+
+            if(ruleOutput == null || ruleFormData == null) {
+                this.ruleData?.subscribe((data: RuleDataResponseDTO) => {
+                    let almostCards :any = data.outputData!.map((c: RuleOutputResponseDTO , i: number) =>{
                         let dataSrc = c.fields?.map((field: RuleOutputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
                         return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
                     });
                     almostCards.forEach((c: any, index: number) => {
-                        c.fGroup.get('title')?.patchValue(data[index].className)
-                        c.fGroup.get('descr')?.patchValue(data[index].classDescription)
+                        c.fGroup.get('title')?.patchValue(data.outputData![index].className)
+                        c.fGroup.get('descr')?.patchValue(data.outputData![index].classDescription)
                     });
                     this.cards = almostCards
+                    this.updateSubscriptions()
                 });
             }
+            // if(this.projectId != null){
+            //     this.designControllerService.getRuleOutputData(parseInt(this.projectId!)).subscribe((data: RuleOutputResponseDTO[]) => {
+            //         let almostCards :any = data.map((c: RuleOutputResponseDTO , i: number) =>{
+            //             let dataSrc = c.fields?.map((field: RuleOutputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
+            //             return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
+            //         });
+            //         almostCards.forEach((c: any, index: number) => {
+            //             c.fGroup.get('title')?.patchValue(data[index].className)
+            //             c.fGroup.get('descr')?.patchValue(data[index].classDescription)
+            //         });
+            //         this.cards = almostCards
+            //     });
+            // }
         }
-        this.cards.forEach((c: CardData) => {
-            c.fGroup.valueChanges.subscribe(() => {
-                this.needToBeSaved.next(true)
-            });
-        });
+    }
+
+
+
+    updateSubscriptions(){
         this.subscriptions.push(this.needToBeSaved.subscribe((b: boolean) => {
             if(b){
                 this.onSave(false)
+                console.log("saving without forcing")
             }
         }));
+        this.cards.forEach((c: CardData) => {
+            this.subscriptions.push(c.fGroup.valueChanges.pipe(debounceTime(300)).subscribe((val) => {
+                this.needToBeSaved.next(true)
+                console.log("need to be saved")
+                console.log(val)
+            }));
+        });
     }
 
 
@@ -188,14 +216,16 @@ export class RuleOutputComponent {
         const maxId : number = this.cards.length > 0 ? this.cards.reduce((a,b)=> a.id > b.id  ? a : b)?.id : 0;
         let newCard = {id: maxId + 1, filteredOptions: this.options.slice(), readOnly: false , fGroup: this.generateFgroup(), dataSource: []}
         this.cards = [...this.cards, newCard]
-        newCard.fGroup.valueChanges.subscribe(() => {
-            this.needToBeSaved.next(true)
-        });
+        this.updateSubscriptions()
+        // newCard.fGroup.valueChanges.subscribe(() => {
+        //     this.needToBeSaved.next(true)
+        // });
     }
 
 
     onDeleteCard(card: CardData) {
         this.cards = [...this.cards.filter(c => c.id != card.id)]
+        this.updateSubscriptions()
     }
 
     onDeleteCardField(card: CardData,cardField:  {dataIdentifier: string, dataType: string}) {

@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {MatAccordion, MatExpansionModule} from '@angular/material/expansion';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
@@ -15,6 +15,9 @@ import { RuleDesignWhenComponent } from "../rule-design-when/rule-design-when.co
 import {LocalKeys} from "../../app.routes";
 import {RuleDesignThenComponent} from "../rule-design-then/rule-design-then.component";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
+import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
+import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
+import {Observable} from "rxjs";
 
 
 interface Rule {
@@ -59,6 +62,8 @@ interface Action {
   styleUrl: './rule-design.component.css'
 })
 export class RuleDesignComponent {
+  @Input() ruleData?: Observable<RuleDataResponseDTO>;
+
   @ViewChild(MatAccordion) accordion?: MatAccordion;
   rules: Rule[] = [];
   availableClasses: any[] = [];
@@ -67,6 +72,7 @@ export class RuleDesignComponent {
       public dialog: MatDialog,
       public ruleDesignDataSharingService: RuleDesignDataSharingService
   ) {}
+
 
   ngOnInit() {
     this.loadAvailableClasses();
@@ -81,11 +87,16 @@ export class RuleDesignComponent {
   private loadAvailableClasses() {
     const ruleInput = localStorage.getItem(LocalKeys.RULE_INPUT);
     const ruleFormData = localStorage.getItem(LocalKeys.RULE_INPUT_FORM_DATA);
+    
+    if(!ruleInput || !ruleFormData){
+      console.warn("Rule input or form data is missing from local storage")
+    }
+    let inputCards: any = []
+    let formDataArray : any
 
     if (ruleInput && ruleFormData) {
-      const inputCards = JSON.parse(ruleInput);
-      const formDataArray = JSON.parse(ruleFormData);
-
+      inputCards = JSON.parse(ruleInput);
+      formDataArray = JSON.parse(ruleFormData);
       this.availableClasses = inputCards.map((card: any, index: number) => ({
         title: formDataArray[index]?.title || `Class ${index + 1}`,
         fields: card.dataSource.map((field: any) => ({
@@ -93,6 +104,16 @@ export class RuleDesignComponent {
           type: field.dataType
         }))
       }));
+    }else{
+     this.ruleData?.subscribe((data: RuleDataResponseDTO)=>{
+       this.availableClasses = data.inputData!.map((card: any, index: number) => ({
+         title: card.className || `Class ${index + 1}`,
+         fields: card.fields.map((field: any) => ({
+           identifier: field.fieldName,
+           type: field.fieldType
+         }))
+       }));
+     });
     }
   }
 

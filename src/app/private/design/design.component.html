@@ -9,7 +9,7 @@
                         </ng-template>
                         <div class="rd_container">
                             <div class="rd_inner_container">
-                                <app-rule-design></app-rule-design>
+                                <app-rule-design [ruleData]="ruleData"></app-rule-design>
                             </div>
                         </div>
 
@@ -20,15 +20,14 @@
                             <mat-icon class="example-tab-icon">input</mat-icon>
                             Input
                         </ng-template>
-                        <app-rule-input [options]="dataTypes"></app-rule-input>
+                        <app-rule-input [ruleData]="ruleData" [options]="dataTypes"></app-rule-input>
                     </mat-tab>
-
                     <mat-tab>
                         <ng-template mat-tab-label>
                             <mat-icon class="example-tab-icon">output</mat-icon>
                             Output
                         </ng-template>
-                        <app-rule-output [options]="dataTypes"></app-rule-output>
+                        <app-rule-output [ruleData]="ruleData" [options]="dataTypes"></app-rule-output>
                     </mat-tab>
                 </mat-tab-group>
 

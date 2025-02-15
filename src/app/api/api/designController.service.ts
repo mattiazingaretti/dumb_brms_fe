@@ -17,6 +17,7 @@ import { HttpClient, HttpHeaders, HttpParams,
 import { Observable }                                        from 'rxjs';
 
 import { PostedResourceDTO } from '../model/postedResourceDTO';
+import { RuleDataResponseDTO } from '../model/ruleDataResponseDTO';
 import { RuleDataTypesDTO } from '../model/ruleDataTypesDTO';
 import { RuleInputRequestDTO } from '../model/ruleInputRequestDTO';
 import { RuleInputResponseDTO } from '../model/ruleInputResponseDTO';
@@ -180,6 +181,47 @@ export class DesignControllerService {
         ];
 
         return this.httpClient.request<Array<RuleDataTypesDTO>>('get',`${this.basePath}/design/getDataTypes`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getRuleData(projectId: number, observe?: 'body', reportProgress?: boolean): Observable<RuleDataResponseDTO>;
+    public getRuleData(projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<RuleDataResponseDTO>>;
+    public getRuleData(projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<RuleDataResponseDTO>>;
+    public getRuleData(projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling getRuleData.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<RuleDataResponseDTO>('get',`${this.basePath}/design/getRuleData/${encodeURIComponent(String(projectId))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

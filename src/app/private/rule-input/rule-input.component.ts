@@ -1,4 +1,4 @@
-import {CtaComponent} from './../../shared/cta/cta.component';
+import {CtaComponent} from '../../shared/cta/cta.component';
 import {MatInputModule} from '@angular/material/input';
 import {Component, ElementRef, Input, QueryList, ViewChildren} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
@@ -13,7 +13,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {CommonModule} from "@angular/common";
 import {LocalKeys} from "../../app.routes";
-import {BehaviorSubject, debounce, debounceTime, Subscription} from "rxjs";
+import {BehaviorSubject, debounceTime, Observable, Subscription} from "rxjs";
 import {DesignControllerService} from "../../api/api/designController.service";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {ActivatedRoute} from "@angular/router";
@@ -21,6 +21,7 @@ import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseD
 import {RuleInputRequestDTO} from "../../api/model/ruleInputRequestDTO";
 import {PostedResourceDTO} from "../../model/postedResourceDTO";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
+import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
 
 
 export interface CardData {
@@ -45,6 +46,7 @@ export class RuleInputComponent {
   needToBeSaved: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   @Input() options: string[] = []//['NUMERIC', 'BOOLEAN', 'STRING', 'NUMERIC[]', 'STRING[]', 'BOOLEAN[]','NUMERIC{}', 'STRING{}', 'BOOLEAN{}'  ];
+  @Input() ruleData?: Observable<RuleDataResponseDTO>
 
   cards: CardData[] = []
 
@@ -78,6 +80,7 @@ export class RuleInputComponent {
   }
 
   ngOnInit(): void {
+
     this.projectId = this.route.snapshot.queryParamMap.get('id');
     if(this.projectId == null){
       console.error("Project Id is null");
@@ -96,24 +99,38 @@ export class RuleInputComponent {
       this.cards = almostCards
       this.updateSubscriptions()
     }else{
-        if(this.projectId != null){
-          this.designControllerService.getRuleInputData(parseInt(this.projectId!)).subscribe((data: RuleInputResponseDTO[]) => {
-              let almostCards :any = data.map((c: RuleInputResponseDTO , i: number) =>{
-                  let dataSrc = c.fields?.map((field: RuleInputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
-                  return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
-              });
-              almostCards.forEach((c: any, index: number) => {
-                  c.fGroup.get('title')?.patchValue(data[index].className)
-                  c.fGroup.get('descr')?.patchValue(data[index].classDescription)
-              });
-              this.cards = almostCards
-            this.updateSubscriptions()
-          });
-      }
+      this.ruleData?.subscribe((data: RuleDataResponseDTO) => {
+
+        let almostCards :any = data.inputData!.map((c: RuleInputResponseDTO , i: number) =>{
+          let dataSrc = c.fields?.map((field: RuleInputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
+          return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
+        });
+        almostCards.forEach((c: any, index: number) => {
+          c.fGroup.get('title')?.patchValue(data.inputData![index].className)
+          c.fGroup.get('descr')?.patchValue(data.inputData![index].classDescription)
+        });
+        this.cards = almostCards
+        this.updateSubscriptions()
+      });
+      //   if(this.projectId != null){
+      //
+      //     this.designControllerService.getRuleInputData(parseInt(this.projectId!)).subscribe((data: RuleInputResponseDTO[]) => {
+      //         let almostCards :any = data.map((c: RuleInputResponseDTO , i: number) =>{
+      //             let dataSrc = c.fields?.map((field: RuleInputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
+      //             return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
+      //         });
+      //         almostCards.forEach((c: any, index: number) => {
+      //             c.fGroup.get('title')?.patchValue(data[index].className)
+      //             c.fGroup.get('descr')?.patchValue(data[index].classDescription)
+      //         });
+      //         this.cards = almostCards
+      //       this.updateSubscriptions()
+      //     });
+      // }
+
     }
-
-
   }
+
 
 
   getFormControl(card: CardData, arg: string): FormControl {
