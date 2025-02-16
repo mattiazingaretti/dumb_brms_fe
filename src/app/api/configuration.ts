@@ -19,7 +19,7 @@ export class Configuration {
     password?: string;
     accessToken?: string | (() => string);
     basePath?: string;
-    withCredentials?: boolean;
+    withCredentials?: boolean = true;
 
     constructor(
         @Optional() @Inject(CONFIGURATION_PARAMETERS) configurationParameters: ConfigurationParameters = {}

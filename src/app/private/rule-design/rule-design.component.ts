@@ -7,7 +7,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import { CommonModule } from '@angular/common';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { CtaComponent } from '../../shared/cta/cta.component';
 import {  MatDialog} from '@angular/material/dialog';
 import { DesignDialogComponent } from '../dialogs/design-dialog/design-dialog.component';
@@ -18,11 +18,15 @@ import {RuleDesignDataSharingService} from "../../shared/services/rule-design-da
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {Observable} from "rxjs";
+import {DynamicFormFieldComponent} from "../../shared/dynamic-form-field/dynamic-form-field.component";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {WarningDialogComponent} from "../../shared/dialogs/warning-dialog/warning-dialog.component";
 
 
 interface Rule {
   idRule: number;
   ruleName: string;
+  salience: number;
   conditions: Condition[];
   actions: Action[];
 }
@@ -31,7 +35,9 @@ interface Condition {
   class?: string;
   field?: string;
   operator?: string;
+  idCondition?: string;
   value?: any;
+  useIdCondition?: boolean;
 }
 
 interface Action {
@@ -56,7 +62,8 @@ interface Action {
     MatSlideToggleModule,
     CtaComponent,
     RuleDesignWhenComponent,
-    RuleDesignThenComponent
+    RuleDesignThenComponent,
+    DynamicFormFieldComponent
   ],
   templateUrl: './rule-design.component.html',
   styleUrl: './rule-design.component.css'
@@ -67,6 +74,7 @@ export class RuleDesignComponent {
   @ViewChild(MatAccordion) accordion?: MatAccordion;
   rules: Rule[] = [];
   availableClasses: any[] = [];
+  formGroup: FormGroup = new FormGroup({});
 
   constructor(
       public dialog: MatDialog,
@@ -76,6 +84,7 @@ export class RuleDesignComponent {
 
   ngOnInit() {
     this.loadAvailableClasses();
+    this.formGroup = new FormGroup({});
     this.loadSavedRules();
     this.ruleDesignDataSharingService.isRefreshDataNeeded().subscribe((flg)=>{
       if(flg){
@@ -106,7 +115,7 @@ export class RuleDesignComponent {
       }));
     }else{
      this.ruleData?.subscribe((data: RuleDataResponseDTO)=>{
-       this.availableClasses = data.inputData!.map((card: any, index: number) => ({
+       this.availableClasses = [...data.inputData!, ...data.outputData!].map((card: any, index: number) => ({
          title: card.className || `Class ${index + 1}`,
          fields: card.fields.map((field: any) => ({
            identifier: field.fieldName,
@@ -119,9 +128,14 @@ export class RuleDesignComponent {
 
   private loadSavedRules() {
     const savedRules = localStorage.getItem(LocalKeys.RULES);
-    if (savedRules) {
-      this.rules = JSON.parse(savedRules);
+    if (!savedRules) {
+      console.warn("No saved rules found");
+      return;
     }
+    this.rules = JSON.parse(savedRules);
+    this.rules.forEach((r)=>{
+      this.formGroup.addControl(r.idRule.toString(), new FormControl<number|null>(100, [Validators.required, Validators.pattern(/^[0-9]*$/)]));
+    })
   }
 
   addRule() {
@@ -136,7 +150,8 @@ export class RuleDesignComponent {
           idRule: this.rules.length + 1,
           ruleName: result.ruleName,
           conditions: [],
-          actions: []
+          actions: [],
+          salience: 100
         };
         this.rules = [...this.rules, newRule];
         this.saveRules();
@@ -148,11 +163,53 @@ export class RuleDesignComponent {
     localStorage.setItem(LocalKeys.RULES, JSON.stringify(this.rules));
   }
 
-  onRulesChange() {
+  onRulesChange(conditions: Condition[], rule: Rule) {
+    rule.conditions = conditions;
+    this.rules = [...this.rules];
     this.saveRules();
   }
 
   ngOnDestroy() {
     this.ruleDesignDataSharingService.completeRefreshData()
+  }
+
+  getFormControl(idRule: number) {
+    return this.formGroup.get(idRule.toString()) as FormControl;
+  }
+
+  onSalienceChange(rule: Rule) {
+    const control = this.getFormControl(rule.idRule);
+    if (control && control.valid ) {
+      rule.salience = control.value;
+      this.rules = [...this.rules];
+      this.saveRules();
+    }
+  }
+
+  deleteRule(rule: Rule) {
+    const dialogRef = this.dialog.open(WarningDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Confirm Deletion',
+        message: `Are you sure you want to delete Rule "${rule.ruleName}"?`,
+        confirmLabel: 'Delete',
+        cancelLabel: 'Cancel',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        const filteredRules = this.rules.filter((r) => r.idRule !== rule.idRule);
+        this.rules = [...filteredRules]
+        this.saveRules();
+      }else {
+        console.warn("Deletion cancelled");
+      }
+    });
+
+  }
+
+  toggleRuleActivation(idRule: number, $event: MatSlideToggleChange) {
+    console.warn("Toggle rule activation", idRule, $event.checked);
   }
 }

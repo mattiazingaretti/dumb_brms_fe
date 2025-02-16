@@ -1,45 +1,98 @@
-<div class="condition-container">
-    <div *ngFor="let condition of conditions; let i = index" class="condition-row">
-        <mat-form-field>
-            <mat-label>Class</mat-label>
-            <mat-select [(ngModel)]="condition.class" (ngModelChange)="conditionsChange.emit(conditions)">
-                <mat-option *ngFor="let cls of availableClasses" [value]="cls.title">
-                    {{ cls.title }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+<form [formGroup]="conditionsForm" class="condition-container">
+    <!-- List of Conditions -->
+    <div formArrayName="conditions">
+        <div *ngFor="let condition of conditionsArray.controls; let i = index" class="condition-row" [formGroupName]="i">
+            <!-- ID CONDITION Input -->
+            <mat-form-field>
+                <mat-label>ID CONDITION</mat-label>
+                <input matInput formControlName="idCondition" placeholder="Enter ID" />
+                <mat-error *ngIf="condition.get('idCondition')?.invalid && condition.get('idCondition')?.touched">
+                    ID CONDITION must be unique.
+                </mat-error>
+            </mat-form-field>
 
-        <mat-form-field *ngIf="condition.class">
-            <mat-label>Field</mat-label>
-            <mat-select [(ngModel)]="condition.field" (ngModelChange)="conditionsChange.emit(conditions)">
-                <mat-option *ngFor="let field of getClassFields(condition.class) ; trackBy: trackByField"
-                            [value]="field.identifier">
-                    {{ field.identifier }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+            <!-- Toggle Button -->
+            <mat-slide-toggle formControlName="useIdCondition" *ngIf="isToggleVisible(i)">
+                Use ID CONDITION List
+            </mat-slide-toggle>
 
-        <mat-form-field *ngIf="condition.field">
-            <mat-label>Operator</mat-label>
-            <mat-select [(ngModel)]="condition.operator" (ngModelChange)="conditionsChange.emit(conditions)">
-                <mat-option *ngFor="let op of operators" [value]="op">
-                    {{ op }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+            <!-- Class Dropdown -->
+            <mat-form-field>
+                <mat-label>Class</mat-label>
+                <mat-select formControlName="class">
+                    <mat-option *ngFor="let cls of availableClasses" [value]="cls.title">
+                        {{ cls.title }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
 
-        <mat-form-field *ngIf="condition.operator">
-            <input matInput [(ngModel)]="condition.value"
-                   (ngModelChange)="conditionsChange.emit(conditions)"
-                   placeholder="Value">
-        </mat-form-field>
+            <!-- Field Dropdown -->
+            <mat-form-field *ngIf="condition.get('class')?.value">
+                <mat-label>Field</mat-label>
+                <mat-select formControlName="field">
+                    <mat-option *ngFor="let field of getClassFields(condition.get('class')?.value)" [value]="field.identifier">
+                        {{ field.identifier }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="condition.errors?.['mismatchedClassType']">
+                    The selected fields must have the same class data type.
+                </mat-error>
+            </mat-form-field>
 
-        <button mat-icon-button color="warn" (click)="removeCondition(i)">
-            <mat-icon>delete</mat-icon>
+            <!-- Operator Dropdown -->
+            <mat-form-field *ngIf="condition.get('field')?.value">
+                <mat-label>Operator</mat-label>
+                <mat-select formControlName="operator">
+                    <mat-option *ngFor="let op of operators" [value]="op">
+                        {{ op }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Value Input or ID CONDITION Dropdown -->
+            <mat-form-field *ngIf="!condition.get('useIdCondition')?.value && condition.get('operator')?.value">
+                <input matInput formControlName="value" placeholder="Value" />
+            </mat-form-field>
+            <mat-form-field *ngIf="condition.get('useIdCondition')?.value && condition.get('operator')?.value">
+                <mat-label>Select ID CONDITION</mat-label>
+                <mat-select formControlName="referencedIdCondition">
+                    <mat-option *ngFor="let otherCondition of getOtherConditions(i)" [value]="otherCondition">
+                        {{ otherCondition }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Selected ID CONDITION Field Dropdown -->
+            <mat-form-field *ngIf="condition.get('useIdCondition')?.value && condition.get('referencedIdCondition')?.value">
+                <mat-label>SELECTED ID CONDITION FIELD</mat-label>
+                <mat-select formControlName="selectedIdConditionField">
+                    <mat-option *ngFor="let field of getIdConditionFields(condition.get('referencedIdCondition')?.value)" [value]="field.identifier">
+                        {{ field.identifier }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="condition.errors?.['mismatchedClassType']">
+                    The selected fields must have the same class data type.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Remove Condition Button -->
+            <button mat-icon-button color="warn" (click)="removeCondition(i)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Condition Button (Near the List) -->
+    <div class="add-condition-section">
+        <button mat-stroked-button (click)="addCondition()">
+            <mat-icon>add</mat-icon> Add Condition
         </button>
     </div>
 
-    <button mat-stroked-button (click)="addCondition()">
-        <mat-icon>add</mat-icon> Add Condition
-    </button>
-</div>
+    <!-- Save Button (In a Separate Section, e.g., Footer) -->
+    <div class="save-section">
+        <button mat-raised-button color="primary" (click)="save()" [disabled]="!conditionsForm.valid">
+            Save
+        </button>
+    </div>
+</form>?

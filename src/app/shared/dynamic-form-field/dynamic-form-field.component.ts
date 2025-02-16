@@ -29,6 +29,7 @@ export class DynamicFormFieldComponent {
 
   isEdit: boolean = false;
 
+  @Input() label: string = '';
   @Input() fControl?: FormControl<any> = new FormControl();
   @Output() changed: EventEmitter<any> = new EventEmitter();
 
