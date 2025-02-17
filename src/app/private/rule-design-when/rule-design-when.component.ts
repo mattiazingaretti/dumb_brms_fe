@@ -1,4 +1,12 @@
-import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+    FormArray,
+    FormBuilder,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators, ɵFormGroupRawValue,
+    ɵGetProperty, ɵTypedOrUntyped
+} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule, MatLabel} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
@@ -130,18 +138,22 @@ export class RuleDesignWhenComponent {
         return (formGroup: FormGroup) => {
             const fieldControl = formGroup.get('field');
             const selectedIdConditionFieldControl = formGroup.get('selectedIdConditionField');
+            const selectedIdConditionControl = formGroup.get('referencedIdCondition');
             const classControl = formGroup.get('class');
             const useIdConditionControl = formGroup.get('useIdCondition');
 
             if (
                 useIdConditionControl?.value &&
                 selectedIdConditionFieldControl?.value &&
-                fieldControl?.value
+                fieldControl?.value &&
+                classControl?.value && selectedIdConditionControl?.value
             ) {
-                const fieldClass = this.getFieldClass(fieldControl.value);
-                const selectedFieldClass = this.getSelectedFieldClass(selectedIdConditionFieldControl.value);
+                const fieldType = this.getFieldDataType(fieldControl.value, classControl?.value);
+                const conditionOfSelectedType = ((this.conditionsForm.controls['conditions'] as any).controls as FormGroup[]).find((f: any)=> f.controls['idCondition'].value === selectedIdConditionControl.value)
+                const classOfSelectedType = conditionOfSelectedType?.controls['class'].value;
+                const selectedFieldType = this.getFieldDataType(selectedIdConditionFieldControl.value, classOfSelectedType);
 
-                if (fieldClass !== selectedFieldClass) {
+                if (fieldType !== selectedFieldType) {
                     return { mismatchedClassType: true };
                 }
             }
@@ -150,12 +162,8 @@ export class RuleDesignWhenComponent {
         };
     }
 
-    getFieldClass(fieldIdentifier: string): string | null {
-        const classTitle = this.conditionsForm.get('class')?.value;
-        const field = this.getClassFields(classTitle).find(f => f.identifier === fieldIdentifier);
-        console.warn("field",field, this.availableClasses)
-        console.warn("field identifier",fieldIdentifier)
-        return field?.type || null; // Assuming each field has a 'type' property
+    getFieldDataType(fieldIdentifier: string, classValue: string | undefined): string | null {
+        return this.availableClasses.find(c => c.title === classValue)?.fields.find((f: any) => f.identifier === fieldIdentifier)?.type;
     }
 
     getSelectedFieldClass(fieldIdentifier: string): string | null {
