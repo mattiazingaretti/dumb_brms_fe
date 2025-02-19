@@ -9,9 +9,8 @@ import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {MatSelect} from "@angular/material/select";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
-import {Condition, Rule} from "../rule-design/rule-design.component";
+import {Rule} from "../rule-design/rule-design.component";
 import {LocalKeys} from "../../app.routes";
-import {cond} from "three/examples/jsm/nodes/math/CondNode";
 
 @Component({
   selector: 'app-rule-design-when',

@@ -9,6 +9,7 @@ import { DashboardComponent } from './private/dashboard/dashboard.component';
 import { DesignComponent } from './private/design/design.component';
 import {authGuard} from "./shared/auth.guard";
 import {SettingsComponent} from "./private/settings/settings.component";
+import {ActionConfigComponent} from "./private/action-config/action-config.component";
 
 export const LocalKeys = {
     AUTH_TOKEN: 'authToken',
@@ -29,6 +30,7 @@ export const AppPaths = {
     ABOUT:'about',
     ROOT: '',
     DASHBOARD: 'dashboard',
+    ACTION_CONFIG: 'configAction',
     DESIGN_BOARD: 'design'
 }
 
@@ -41,6 +43,6 @@ export const routes: Routes = [
     { path: AppPaths.LOGIN, title: 'login page', component: LoginComponent},
     { path: AppPaths.SIGNUP, title: 'signup page', component: SignupComponent},
     { path: AppPaths.DESIGN_BOARD, title: 'design page', component: DesignComponent , canActivate: [authGuard]},
-    { path: AppPaths.SETTINGS, title: 'settings page', component: SettingsComponent , canActivate: [authGuard]}
-
+    { path: AppPaths.SETTINGS, title: 'settings page', component: SettingsComponent , canActivate: [authGuard]},
+    { path: AppPaths.ACTION_CONFIG, title: 'action config page', component: ActionConfigComponent , canActivate: [authGuard]}
 ];

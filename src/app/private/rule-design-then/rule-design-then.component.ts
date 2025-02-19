@@ -6,6 +6,8 @@ import {FormsModule} from "@angular/forms";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
+import {Router} from "@angular/router";
+import {AppPaths} from "../../app.routes";
 
 @Component({
   selector: 'app-rule-design-then',
@@ -27,28 +29,16 @@ import {MatInput} from "@angular/material/input";
   styleUrl: './rule-design-then.component.css'
 })
 export class RuleDesignThenComponent {
-  @Input() availableClasses: any[] = [];
-  @Input() actions: any[] = [];
-  @Output() actionsChange = new EventEmitter<any[]>();
 
-  getClassFields(className: string): any[] {
-    if (!className) return [];
-    const selectedClass = this.availableClasses.find(c => c.title === className);
-    return selectedClass?.fields || [];
+
+  constructor(private router: Router) {
   }
 
-  addAction() {
-    this.actions = [...this.actions, {}];
-    this.actionsChange.emit(this.actions);
+  goToNewActionConfig() {
+    this.router.navigate([AppPaths.DESIGN_BOARD], {
+      queryParams: {ruleId: 0,projectId:0 }
+    })
   }
 
-  removeAction(index: number) {
-    this.actions.splice(index, 1);
-    this.actionsChange.emit(this.actions);
-  }
-
-  trackByFn(index: number) {
-    return index;
-  }
 
 }
