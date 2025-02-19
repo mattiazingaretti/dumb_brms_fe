@@ -34,7 +34,8 @@
                         {{ field.identifier }}
                     </mat-option>
                 </mat-select>
-                <mat-error *ngIf="condition.errors?.['mismatchedClassType']">
+                <mat-label>{{ condition.errors }}</mat-label>
+                <mat-error *ngIf="condition.get('field')?.hasError('mismatchedClassType')">
                     The selected fields must have the same class data type.
                 </mat-error>
             </mat-form-field>
@@ -95,4 +96,4 @@
             Save
         </button>
     </div>
-</form>?
+</form>

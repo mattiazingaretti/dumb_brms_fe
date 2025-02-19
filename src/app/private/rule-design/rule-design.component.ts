@@ -23,7 +23,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {WarningDialogComponent} from "../../shared/dialogs/warning-dialog/warning-dialog.component";
 
 
-interface Rule {
+export interface Rule {
   idRule: number;
   ruleName: string;
   salience: number;
@@ -31,7 +31,7 @@ interface Rule {
   actions: Action[];
 }
 
-interface Condition {
+export interface Condition {
   class?: string;
   field?: string;
   operator?: string;
@@ -40,7 +40,7 @@ interface Condition {
   useIdCondition?: boolean;
 }
 
-interface Action {
+export interface Action {
   class?: string;
   field?: string;
   value?: any;
@@ -211,5 +211,9 @@ export class RuleDesignComponent {
 
   toggleRuleActivation(idRule: number, $event: MatSlideToggleChange) {
     console.warn("Toggle rule activation", idRule, $event.checked);
+  }
+
+  getRuleConditions(rule: Rule) {
+    return this.rules.find((r:any) => r.idRule === rule.idRule)?.conditions || [];
   }
 }
