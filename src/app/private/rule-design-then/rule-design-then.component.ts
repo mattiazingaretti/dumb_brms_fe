@@ -35,7 +35,7 @@ export class RuleDesignThenComponent {
   }
 
   goToNewActionConfig() {
-    this.router.navigate([AppPaths.DESIGN_BOARD], {
+    this.router.navigate([AppPaths.ACTION_CONFIG], {
       queryParams: {ruleId: 0,projectId:0 }
     })
   }

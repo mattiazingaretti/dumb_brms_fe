@@ -1,0 +1,56 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav mode="over" #sidenav >
+        <app-dynamic-form-field [fControl]="getFormControl()"  >
+        </app-dynamic-form-field>
+
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <button mat-icon-button color="primary" class="menu-button" (click)="toggleSidenav()">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <div class="flow-wrapper">
+            <f-flow fDraggable>
+                <f-canvas fZoom>
+                    <f-connection fType="bezier" fOutputId="output1" fInputId="input1">
+                        <svg viewBox="0 0 10 10" fMarker [type]="eMarkerType.START" [height]="10" [width]="10" [refX]="5" [refY]="5">
+                            <circle cx="5" cy="5" r="2" stroke="none" fill="var(--connection-gradient-1)"></circle>
+                        </svg>
+                        <svg viewBox="0 0 700 700" fMarker [type]="eMarkerType.END" [height]="5" [width]="5" [refX]="4" [refY]="2.5">
+                            <path fill="var(--connection-gradient-2)" d="M0,0L700,350L0,700L150,350z"/>
+                        </svg>
+                    </f-connection>
+                    <div fNode fDragHandle   [fNodePosition]="{ x: 0, y: 0 }" fNodeOutput fOutputId="output1"
+                         fOutputConnectableSide="right">
+                        Drag me
+                    </div>
+                    <div fNode fDragHandle [fNodePosition]="{ x: 244, y: 24 }" fNodeInput fInputId="input1"
+                         fInputConnectableSide="left">
+                        Drag me
+                    </div>
+                </f-canvas>
+            </f-flow>
+            <div class="cta-buttons">
+                <div class="top-row">
+                    <button mat-raised-button color="primary" (click)="backToRuleSettings()">
+                        Back
+                    </button>
+                    <button mat-raised-button color="accent" (click)="save()">
+                        Save
+                    </button>
+                </div>
+                <div class="second-row">
+                    <button mat-icon-button color="primary" (click)="zoomIn()">
+                        <mat-icon>zoom_in_outline</mat-icon>
+                    </button>
+                    <button mat-icon-button color="primary" (click)="zoomOut()">
+                        <mat-icon>zoom_out</mat-icon>
+                    </button>
+                    <button mat-icon-button color="primary" (click)="reset()">
+                        <mat-icon>refresh</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <app-footer></app-footer>
+    </mat-sidenav-content>
+</mat-sidenav-container>

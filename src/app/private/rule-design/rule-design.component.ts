@@ -16,10 +16,11 @@ import {LocalKeys} from "../../app.routes";
 import {RuleDesignThenComponent} from "../rule-design-then/rule-design-then.component";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
-import {Observable} from "rxjs";
+import {Observable, take} from "rxjs";
 import {DynamicFormFieldComponent} from "../../shared/dynamic-form-field/dynamic-form-field.component";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {WarningDialogComponent} from "../../shared/dialogs/warning-dialog/warning-dialog.component";
+import {Workflow} from "../action-config/action-config.component";
 
 
 export interface Rule {
@@ -28,6 +29,7 @@ export interface Rule {
   salience: number;
   conditions: Condition[];
   actions: Action[];
+  workflow?: Workflow;
 }
 
 export interface Condition {
@@ -113,7 +115,7 @@ export class RuleDesignComponent {
         }))
       }));
     }else{
-     this.ruleData?.subscribe((data: RuleDataResponseDTO)=>{
+     this.ruleData?.pipe(take(1)).subscribe((data: RuleDataResponseDTO)=>{
        this.availableClasses = [...data.inputData!, ...data.outputData!].map((card: any, index: number) => ({
          title: card.className || `Class ${index + 1}`,
          fields: card.fields.map((field: any) => ({

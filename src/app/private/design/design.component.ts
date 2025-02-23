@@ -10,6 +10,7 @@ import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
 import {DesignControllerService} from "../../api/api/designController.service";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
 import {Observable} from "rxjs";
+import {RuleDataCacheService} from "../../shared/services/rule-data-cache.service";
 
 
 @Component({
@@ -27,7 +28,8 @@ export class DesignComponent {
 
   constructor(
       public route : ActivatedRoute,
-      public  designControllerService: DesignControllerService
+      public  designControllerService: DesignControllerService,
+      public ruleDataCacheService: RuleDataCacheService
   ){
     this.route.queryParams.subscribe((params: {[key: string]: any})=>{
       this.idProject = params['id']
@@ -36,7 +38,7 @@ export class DesignComponent {
         //redirect to error page and kick the user out.
         return;
       }
-      this.ruleData = this.designControllerService.getRuleData(parseInt(this.idProject))
+      this.ruleData = this.ruleDataCacheService.getCachedRuleData(parseInt(this.idProject))
     });
 
 

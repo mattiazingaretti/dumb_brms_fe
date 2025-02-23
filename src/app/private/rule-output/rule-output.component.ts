@@ -10,7 +10,8 @@ import {
     MatCell,
     MatCellDef,
     MatColumnDef,
-    MatHeaderCell, MatHeaderCellDef,
+    MatHeaderCell,
+    MatHeaderCellDef,
     MatHeaderRow,
     MatHeaderRowDef,
     MatRow,
@@ -30,10 +31,7 @@ import {CardData} from "../rule-input/rule-input.component";
 import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
 import {RuleOutputRequestDTO} from "../../api/model/ruleOutputRequestDTO";
 import {RuleOutputFieldResponseDTO} from "../../api/model/ruleOutputFieldResponseDTO";
-import {RuleDataTypesDTO} from "../../api/model/ruleDataTypesDTO";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
-import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
-import {RuleInputFieldResponseDTO} from "../../api/model/ruleInputFieldResponseDTO";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
 
 @Component({
@@ -131,19 +129,7 @@ export class RuleOutputComponent {
                     this.updateSubscriptions()
                 });
             }
-            // if(this.projectId != null){
-            //     this.designControllerService.getRuleOutputData(parseInt(this.projectId!)).subscribe((data: RuleOutputResponseDTO[]) => {
-            //         let almostCards :any = data.map((c: RuleOutputResponseDTO , i: number) =>{
-            //             let dataSrc = c.fields?.map((field: RuleOutputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
-            //             return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
-            //         });
-            //         almostCards.forEach((c: any, index: number) => {
-            //             c.fGroup.get('title')?.patchValue(data[index].className)
-            //             c.fGroup.get('descr')?.patchValue(data[index].classDescription)
-            //         });
-            //         this.cards = almostCards
-            //     });
-            // }
+
         }
     }
 

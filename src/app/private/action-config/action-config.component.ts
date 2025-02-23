@@ -1,67 +1,132 @@
-import { Component } from '@angular/core';
-import * as d3 from 'd3';
+import {ChangeDetectionStrategy, Component, ViewChild} from '@angular/core';
+import {EFConnectionBehavior, EFMarkerType, FFlowModule, FZoomDirective} from "@foblex/flow";
+import {FooterComponent} from "../../shared/footer/footer.component";
+import {MatButtonModule} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
+import {MatFormField, MatOption, MatSelect} from "@angular/material/select";
+import {MatSidenav, MatSidenavContainer, MatSidenavContent} from "@angular/material/sidenav";
+import {MatLabel} from "@angular/material/form-field";
+import {ActivatedRoute, Router} from "@angular/router";
+import {AppPaths, LocalKeys} from "../../app.routes";
+import {DynamicFormFieldComponent} from "../../shared/dynamic-form-field/dynamic-form-field.component";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {Rule} from "../rule-design/rule-design.component";
 
+
+export interface Workflow {
+  name: string;
+}
 
 @Component({
   selector: 'app-action-config',
   standalone: true,
-  imports: [],
+  imports: [
+    FFlowModule,
+    FooterComponent,
+    FZoomDirective,
+    MatButtonModule,
+    MatIcon,
+    MatSelect,
+    MatOption,
+    MatSidenavContent,
+    MatSidenavContainer,
+    MatFormField,
+    MatSidenav,
+    MatLabel,
+    DynamicFormFieldComponent
+  ],
   templateUrl: './action-config.component.html',
-  styleUrl: './action-config.component.css'
+  styleUrls: ['./action-config.component.css','./action-config.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class ActionConfigComponent {
-  ngAfterViewInit() {
-    this.createFlowchart();
+
+  protected readonly eMarkerType = EFMarkerType;
+
+  @ViewChild(MatSidenav, { static: true })
+  sidenav!: MatSidenav;
+
+  @ViewChild(FZoomDirective, { static: true })
+  fZoomDirective!: FZoomDirective;
+
+
+  workflow?: Workflow;
+  fGroup!: FormGroup;
+
+  projectId: string | null;
+  ruleId: string | null;
+
+
+  constructor(
+      public route : ActivatedRoute,
+      public router : Router
+  ) {
+    this.projectId = this.route.snapshot.queryParamMap.get('projectId');
+    this.ruleId = this.route.snapshot.queryParamMap.get('ruleId');
+
+    this.buildForm();
+    this.getRuleData();
   }
 
-  private createFlowchart() {
-    const data = {
-      name: 'Start',
-      children: [
-        { name: 'Step 1', children: [{ name: 'Step 1.1' }, { name: 'Step 1.2' }] },
-        { name: 'Step 2', children: [{ name: 'Step 2.1' }] },
-        { name: 'End' },
-      ],
-    };
 
-    const margin = { top: 20, right: 120, bottom: 20, left: 120 };
-    const width = 800 - margin.left - margin.right;
-    const height = 600 - margin.top - margin.bottom;
+  zoomIn(): void {
+    this.fZoomDirective.zoomIn();
+  }
+  zoomOut(): void {
+    this.fZoomDirective.zoomOut();
+  }
 
-    const svg = d3.select('#flowchart')
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+  reset(): void {
+    this.fZoomDirective.reset();
+  }
 
-    const treeLayout = d3.tree().size([height, width]);
 
-    const root = d3.hierarchy(data);
-    treeLayout(root);
+  onFunctionSelect(functionName: string): void {
+    console.log(`Selected function: ${functionName}`);
+  }
 
-    const link = svg
-        .selectAll('.link')
-        .data(root.links())
-        .enter()
-        .append('path')
-        .attr('class', 'link')
-        .attr('d', d3.linkHorizontal().x((d:any) => d.y).y((d:any) => d.x))
-        .style('fill', 'none')
-        .style('stroke', '#555')
-        .style('stroke-width', 2);
+  toggleSidenav() {
+    this.sidenav.toggle();
+  }
 
-    const node = svg
-        .selectAll('.node')
-        .data(root.descendants())
-        .enter()
-        .append('g')
-        .attr('class', 'node')
-        .attr('transform', (d) => `translate(${d.y},${d.x})`);
+  save() {
 
-    node.append('circle').attr('r', 10).style('fill', '#fff').style('stroke', '#555');
+  }
 
-    node.append('text')
-        .attr('dy', '.35em')
-        .attr('x', (d) => (d.children ? -13 : 13))
-        .style('text-anchor', (d) => (d.children ? 'end' : 'start'))
-        .text((d) => d.data.name);
+  backToRuleSettings() {
+    this.router.navigate([AppPaths.DESIGN_BOARD], { queryParams: { id: this.projectId} });
+  }
+
+  private buildForm() {
+    this.fGroup = new FormGroup({
+      workflowName: new FormControl('[Workflow Name]', [Validators.required]),
+    })
+  }
+
+  getFormControl() {
+    return this.fGroup.controls['workflowName'] as FormControl;
+  }
+
+
+  private getRuleData() {
+    if(!this.ruleId) {
+      console.error("Undefined rule id");
+      return;
+    }
+
+    const rules = localStorage.getItem(LocalKeys.RULES);
+    if(rules !== null) {
+      const ruleData: Rule[] = JSON.parse(rules);
+      const rule : Rule | undefined = ruleData.find((rule: any) => rule.id === this.ruleId);
+
+      if(rule) {
+
+      }
+    }else{
+      //TODO get rules from API passing also the project id
+
+    }
+
   }
 }
