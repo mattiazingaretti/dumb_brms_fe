@@ -1,12 +1,5 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
-import {
-  EFConnectableSide,
-  EFMarkerType,
-  FCreateNodeEvent,
-  FFlowComponent,
-  FFlowModule,
-  FZoomDirective
-} from "@foblex/flow";
+import {EFMarkerType, FCreateNodeEvent, FFlowComponent, FFlowModule, FZoomDirective} from "@foblex/flow";
 import {FooterComponent} from "../../shared/footer/footer.component";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -29,7 +22,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatChipRow} from "@angular/material/chips";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
-import createFlow from "@foblex/flow";
+import {FSelectionChangeEvent} from "@foblex/flow"
 
 export interface Workflow {
   name: string;
@@ -42,9 +35,10 @@ export enum BlockType {
 }
 
 export interface Block{
+  name: string,
   type: BlockType;
-  id: number,
   key: string,
+  position: {x: number, y: number}
 }
 
 export interface InputDataBlock extends Block {
@@ -82,8 +76,8 @@ export interface ActionBlock extends Block {
     MatExpansionPanel,
     MatExpansionPanelTitle,
     MatExpansionPanelHeader,
-      MatSelectModule,
-      ReactiveFormsModule,
+    MatSelectModule,
+    ReactiveFormsModule,
     NgForOf,
     MatChipRow,
     NgIf,
@@ -212,26 +206,39 @@ export class ActionConfigComponent {
       console.error("Data block Form is invalid");
       return;
     }
+    const selectedData : string = dataBlockControl.value as string;
+    let data: RuleOutputResponseDTO | RuleInputResponseDTO | undefined = undefined
+    let inData: RuleInputResponseDTO | undefined = this.ruleData?.inputData?.find((id)=> id.className === selectedData)
+    let outData :RuleOutputResponseDTO | undefined= this.ruleData?.outputData?.find((id)=> id.className === selectedData)
 
-    const selectedData = dataBlockControl.value as RuleInputResponseDTO | RuleOutputResponseDTO;
-    if(this.isInput(selectedData)) {
-      this.blocks.push({key: 'superKey' ,id: 1,type: BlockType.INPUT_DATA, data: selectedData} as Block);
-    }else {
-        this.blocks.push({key: 'superKey1' , id: 1, type: BlockType.OUTPUT_DATA, data: selectedData} as Block);
+    data  = inData === undefined ? outData === undefined ? undefined : outData : inData
+
+    const lastId = this.blocks.length
+
+    if(data === undefined){
+      console.error("failed to get dto from selected class");
+      return;
     }
-    this.blocks = [...this.blocks];
+
+    if(this.isInput(data)) {
+      this.blocks.push({name: selectedData,key: `input_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.INPUT_DATA, data: data} as Block);
+    }else {
+        this.blocks.push({name: selectedData,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
+    }
     this.fFlow.redraw();
     this.cdr.detectChanges();
     this.cdr.markForCheck();
   }
 
   onCreateNode($event: FCreateNodeEvent<any>) {
-    console.warn($event)
-    // this.nodes.push({
-    //   id: generateGuid(),
-    //   text: event.data || 'node ' + (this.nodes.length + 1),
-    //   position: event.rect
-    // });
     this.cdr.markForCheck();
+  }
+
+  getClassName(block: Block) {
+    return block.type === BlockType.INPUT_DATA ? (block as InputDataBlock).data?.className||'' : (block as OutputDataBlock).data?.className||''  ;
+  }
+
+  onSelectionChange(event: FSelectionChangeEvent) {
+    console.warn(event)
   }
 }

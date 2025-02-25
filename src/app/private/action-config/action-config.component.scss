@@ -13,9 +13,12 @@ f-flow {
 }
 
 
-
 .f-node {
   @include app.node;
+  border: 1px solid var(--node-border-color);
+  &.f-selected {
+    border: 1px solid var(--node-selected-border-color);
+  }
 }
 
 :host {

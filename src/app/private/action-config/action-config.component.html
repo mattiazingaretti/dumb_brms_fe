@@ -36,21 +36,21 @@
             <mat-icon>menu</mat-icon>
         </button>
         <div class="flow-wrapper">
-            <f-flow fDraggable #flow (fCreateNode)="onCreateNode($event)">
+            <f-flow fDraggable #flow (fCreateNode)="onCreateNode($event)" (fSelectionChange)="onSelectionChange($event)">
                 <f-canvas fZoom>
-                    <f-connection fType="bezier" fOutputId="output1" fInputId="input1">
-                        <svg viewBox="0 0 10 10" fMarker [type]="eMarkerType.START" [height]="10" [width]="10" [refX]="5" [refY]="5">
-                            <circle cx="5" cy="5" r="2" stroke="none" fill="var(--connection-gradient-1)"></circle>
-                        </svg>
-                        <svg viewBox="0 0 700 700" fMarker [type]="eMarkerType.END" [height]="5" [width]="5" [refX]="4" [refY]="2.5">
-                            <path fill="var(--connection-gradient-2)" d="M0,0L700,350L0,700L150,350z"/>
-                        </svg>
-                    </f-connection>
+<!--                    <f-connection fType="bezier" fOutputId="output1" fInputId="input1">-->
+<!--                        <svg viewBox="0 0 10 10" fMarker [type]="eMarkerType.START" [height]="10" [width]="10" [refX]="5" [refY]="5">-->
+<!--                            <circle cx="5" cy="5" r="2" stroke="none" fill="var(&#45;&#45;connection-gradient-1)"></circle>-->
+<!--                        </svg>-->
+<!--                        <svg viewBox="0 0 700 700" fMarker [type]="eMarkerType.END" [height]="5" [width]="5" [refX]="4" [refY]="2.5">-->
+<!--                            <path fill="var(&#45;&#45;connection-gradient-2)" d="M0,0L700,350L0,700L150,350z"/>-->
+<!--                        </svg>-->
+<!--                    </f-connection>-->
                     @for (block of blocks; track block.key) {
-                        <div  fNode fDragHandle   [fNodePosition]="{ x: 244+block.id, y: 24+block.id }" [fNodeId]="block.key" >Test</div>
+                        <div  fNode fDragHandle  [fNodePosition]="block.position"  >{{getClassName(block)}}</div>
                     }
-                    <div fNode fDragHandle   [fNodePosition]="{ x: 0, y: 0 }" fNodeOutput fOutputId="output1" fOutputConnectableSide="right">Drag me</div>
-                    <div fNode fDragHandle [fNodePosition]="{ x: 244, y: 24 }" fNodeInput fInputId="input1" fInputConnectableSide="left">Drag me </div>
+<!--                    <div fNode fDragHandle   [fNodePosition]="{ x: 0, y: 0 }" fNodeOutput fOutputId="output1" fOutputConnectableSide="right">Drag me</div>-->
+<!--                    <div fNode fDragHandle [fNodePosition]="{ x: 244, y: 24 }" fNodeInput fInputId="input1" fInputConnectableSide="left">Drag me </div>-->
                 </f-canvas>
             </f-flow>
             <div class="cta-buttons">
