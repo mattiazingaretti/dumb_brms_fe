@@ -22,3 +22,17 @@ f-flow {
   @include app.connection;
   --connection-gradient-2: var(--connection-gradient-2);
 }
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  button {
+    align-self: flex-end;
+  }
+}

@@ -33,6 +33,7 @@ import {RuleOutputRequestDTO} from "../../api/model/ruleOutputRequestDTO";
 import {RuleOutputFieldResponseDTO} from "../../api/model/ruleOutputFieldResponseDTO";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
+import {RULE_CACHE_KEY} from "../../shared/services/rule-data-cache.service";
 
 @Component({
   selector: 'app-rule-output',
@@ -226,6 +227,10 @@ export class RuleOutputComponent {
     onSave(force:boolean = false) {
         localStorage.setItem(LocalKeys.RULE_OUTPUT, JSON.stringify(this.cards.map((c: CardData) => {return {id: c.id,filteredOptions: c.filteredOptions, dataSource: c.dataSource}})))
         localStorage.setItem(LocalKeys.RULE_OUTPUT_FORM_DATA, JSON.stringify(this.cards.map((c: CardData) => {return c.fGroup.value})))
+
+        if(localStorage.getItem(RULE_CACHE_KEY.RULE_DATA + this.projectId) !== null){
+            localStorage.removeItem(RULE_CACHE_KEY.RULE_DATA + this.projectId)
+        }
         if(force){
             let payload : RuleOutputRequestDTO[] = []
             this.cards.forEach((c: CardData) => {

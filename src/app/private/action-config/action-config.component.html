@@ -1,15 +1,42 @@
 <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav mode="over" #sidenav >
-        <app-dynamic-form-field [fControl]="getFormControl()"  >
-        </app-dynamic-form-field>
+    <mat-sidenav mode="side" #sidenav opened="false"  >
+        <div class="form-container">
+            <app-dynamic-form-field [fControl]="getFormControl('workflowName')"  ></app-dynamic-form-field>
+        </div>
+        <mat-accordion>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Data</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="panel-content" >
+                    <mat-form-field appearance="fill"  >
+                        <mat-label>Choose data</mat-label>
+                        <mat-select [formGroup]="fGroup" [formControl]="getFormControl('dataBlock')"   >
+                            <mat-option *ngFor="let dataType of getDataTypes()" [value]="dataType?.className" >
+                                {{dataType.className}}
+                                <mat-chip-row *ngIf="isInput(dataType)" color="primary">Input</mat-chip-row>
+                                <mat-chip-row *ngIf="!isInput(dataType)" color="accent">Output</mat-chip-row>
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" (click)="addDataBlock()">Add block</button>
+                </div>
+            </mat-expansion-panel>
 
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Actions</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p>Your actions here</p>
+            </mat-expansion-panel>
+        </mat-accordion>
     </mat-sidenav>
     <mat-sidenav-content>
         <button mat-icon-button color="primary" class="menu-button" (click)="toggleSidenav()">
             <mat-icon>menu</mat-icon>
         </button>
         <div class="flow-wrapper">
-            <f-flow fDraggable>
+            <f-flow fDraggable #flow (fCreateNode)="onCreateNode($event)">
                 <f-canvas fZoom>
                     <f-connection fType="bezier" fOutputId="output1" fInputId="input1">
                         <svg viewBox="0 0 10 10" fMarker [type]="eMarkerType.START" [height]="10" [width]="10" [refX]="5" [refY]="5">
@@ -19,14 +46,11 @@
                             <path fill="var(--connection-gradient-2)" d="M0,0L700,350L0,700L150,350z"/>
                         </svg>
                     </f-connection>
-                    <div fNode fDragHandle   [fNodePosition]="{ x: 0, y: 0 }" fNodeOutput fOutputId="output1"
-                         fOutputConnectableSide="right">
-                        Drag me
-                    </div>
-                    <div fNode fDragHandle [fNodePosition]="{ x: 244, y: 24 }" fNodeInput fInputId="input1"
-                         fInputConnectableSide="left">
-                        Drag me
-                    </div>
+                    @for (block of blocks; track block.key) {
+                        <div  fNode fDragHandle   [fNodePosition]="{ x: 244+block.id, y: 24+block.id }" [fNodeId]="block.key" >Test</div>
+                    }
+                    <div fNode fDragHandle   [fNodePosition]="{ x: 0, y: 0 }" fNodeOutput fOutputId="output1" fOutputConnectableSide="right">Drag me</div>
+                    <div fNode fDragHandle [fNodePosition]="{ x: 244, y: 24 }" fNodeInput fInputId="input1" fInputConnectableSide="left">Drag me </div>
                 </f-canvas>
             </f-flow>
             <div class="cta-buttons">

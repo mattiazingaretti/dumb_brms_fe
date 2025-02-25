@@ -71,6 +71,7 @@ export interface Action {
 })
 export class RuleDesignComponent {
   @Input() ruleData?: Observable<RuleDataResponseDTO>;
+  @Input() idProject!: string ;
 
   @ViewChild(MatAccordion) accordion?: MatAccordion;
   rules: Rule[] = [];

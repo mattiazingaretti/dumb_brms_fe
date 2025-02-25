@@ -44,4 +44,32 @@ app-dynamic-form-field {
     display: block;
 }
 
+.form-container {
+    margin-bottom: 2rem;
+    width: 100%;
+}
 
+
+
+mat-sidenav {
+    padding: 20px;
+}
+
+mat-accordion {
+    margin-bottom: 20px;
+}
+
+mat-expansion-panel {
+    margin-bottom: 10px;
+}
+
+mat-option {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+}
+
+mat-chip-row {
+    min-height: 24px;
+    font-size: 12px;
+}

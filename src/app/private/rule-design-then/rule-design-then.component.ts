@@ -8,6 +8,7 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {Router} from "@angular/router";
 import {AppPaths} from "../../app.routes";
+import {Rule} from "../rule-design/rule-design.component";
 
 @Component({
   selector: 'app-rule-design-then',
@@ -29,6 +30,8 @@ import {AppPaths} from "../../app.routes";
   styleUrl: './rule-design-then.component.css'
 })
 export class RuleDesignThenComponent {
+  @Input() idProject!: string;
+  @Input() rule!: Rule;
 
 
   constructor(private router: Router) {
@@ -36,7 +39,7 @@ export class RuleDesignThenComponent {
 
   goToNewActionConfig() {
     this.router.navigate([AppPaths.ACTION_CONFIG], {
-      queryParams: {ruleId: 0,projectId:0 }
+      queryParams: {ruleId: this.rule.idRule,projectId:this.idProject }
     })
   }
 

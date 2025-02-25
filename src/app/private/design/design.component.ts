@@ -22,7 +22,7 @@ import {RuleDataCacheService} from "../../shared/services/rule-data-cache.servic
 })
 export class DesignComponent {
 
-  idProject?: string
+  idProject!: string
   dataTypes: string[] = [];
   ruleData?: Observable<RuleDataResponseDTO>;
 

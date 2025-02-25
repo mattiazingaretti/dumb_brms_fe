@@ -22,6 +22,7 @@ import {RuleInputRequestDTO} from "../../api/model/ruleInputRequestDTO";
 import {PostedResourceDTO} from "../../model/postedResourceDTO";
 import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
+import {RULE_CACHE_KEY} from "../../shared/services/rule-data-cache.service";
 
 
 export interface CardData {
@@ -112,22 +113,6 @@ export class RuleInputComponent {
         this.cards = almostCards
         this.updateSubscriptions()
       });
-      //   if(this.projectId != null){
-      //
-      //     this.designControllerService.getRuleInputData(parseInt(this.projectId!)).subscribe((data: RuleInputResponseDTO[]) => {
-      //         let almostCards :any = data.map((c: RuleInputResponseDTO , i: number) =>{
-      //             let dataSrc = c.fields?.map((field: RuleInputFieldResponseDTO) =>  {return {dataIdentifier: field.fieldName, dataType: field.fieldType}}) ?? []
-      //             return {id: i, readOnly: true, filteredOptions: this.options.slice(), fGroup: this.generateFgroup(), dataSource: dataSrc};
-      //         });
-      //         almostCards.forEach((c: any, index: number) => {
-      //             c.fGroup.get('title')?.patchValue(data[index].className)
-      //             c.fGroup.get('descr')?.patchValue(data[index].classDescription)
-      //         });
-      //         this.cards = almostCards
-      //       this.updateSubscriptions()
-      //     });
-      // }
-
     }
   }
 
@@ -207,6 +192,10 @@ export class RuleInputComponent {
   onSave(force:boolean = false) {
     localStorage.setItem(LocalKeys.RULE_INPUT, JSON.stringify(this.cards.map((c: CardData) => {return {id: c.id,filteredOptions: c.filteredOptions, dataSource: c.dataSource}})))
     localStorage.setItem(LocalKeys.RULE_INPUT_FORM_DATA, JSON.stringify(this.cards.map((c: CardData) => {return c.fGroup.value})))
+    //Invalidate cache for rule data.
+    if(localStorage.getItem(RULE_CACHE_KEY.RULE_DATA + this.projectId) !== null){
+      localStorage.removeItem(RULE_CACHE_KEY.RULE_DATA + this.projectId)
+    }
     if(force){
       let payload : RuleInputRequestDTO[] = []
       this.cards.forEach((c: CardData) => {
