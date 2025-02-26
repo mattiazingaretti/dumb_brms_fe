@@ -27,10 +27,45 @@
     gap: 5px;
 }
 f-flow {
-    width: 100%;
-    height: 100%;
+    border: 1px solid black;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    height: 80vh; /* Use viewport height for dynamic sizing */
+    width: 95%; /* Ensure the canvas takes up most of the screen */
+    display: flex; /* Use flexbox for better alignment */
+    justify-content: center; /* Center content horizontally */
+    align-items: flex-start; /* Align content at the top */
+    overflow: auto; /* Enable scrolling if content overflows */
 }
 
+f-canvas {
+    width: 100%; /* Take full width of f-flow */
+    height: 100%; /* Take full height of f-flow */
+    position: relative; /* Allow absolute positioning of child elements */
+}
+
+.f-node {
+    border: 1px solid var(--node-border-color, #ccc);
+    border-radius: 5px;
+    background-color: white;
+    padding: 10px; /* Padding around the node */
+    min-width: 200px;
+    min-height: 100px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    overflow: hidden;
+
+    &.f-selected {
+        border: 2px solid var(--node-selected-border-color, #007bff);
+    }
+}
+
+/* Style for the title (add margin below it) */
+.f-node > div:first-child:not(table) {
+    margin-bottom: 10px; /* Add spacing between the title and the table */
+    font-size: 16px; /* Optional: Adjust font size for better readability */
+    font-weight: bold; /* Optional: Make the title stand out */
+}
 .menu-button {
     position: absolute;
     top: 2%;
@@ -72,4 +107,20 @@ mat-option {
 mat-chip-row {
     min-height: 24px;
     font-size: 12px;
+}
+
+.f-node {
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    max-height: 300px; /* Limit the maximum height of the node */
+}
+
+@media (max-width: 768px) {
+    table.mat-table {
+        font-size: 12px; /* Reduce font size for smaller screens */
+    }
+
+    th.mat-header-cell,
+    td.mat-cell {
+        padding: 6px 8px; /* Reduce padding for smaller screens */
+    }
 }

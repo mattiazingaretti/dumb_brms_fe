@@ -47,7 +47,23 @@
 <!--                        </svg>-->
 <!--                    </f-connection>-->
                     @for (block of blocks; track block.key) {
-                        <div  fNode fDragHandle  [fNodePosition]="block.position"  >{{getClassName(block)}}</div>
+                        <div  fNode fDragHandle  [fNodePosition]="block.position"  class="f-node">
+                            <div>{{getClassName(block)}}</div>
+                            <table *ngIf="block.type !== BlockType.ACTION" mat-table [dataSource]="getDataSource(block)!" class="mat-elevation-z8">
+                                <ng-container matColumnDef="fieldName">
+                                    <th mat-header-cell *matHeaderCellDef> Field Name </th>
+                                    <td mat-cell *matCellDef="let field"> {{ field.fieldName }} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="fieldType">
+                                    <th mat-header-cell *matHeaderCellDef> Field Type </th>
+                                    <td mat-cell *matCellDef="let field"> {{ field.fieldType }} </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="['fieldName', 'fieldType']"></tr>
+                                <tr mat-row *matRowDef="let row; columns: ['fieldName', 'fieldType'];"></tr>
+                            </table>
+                        </div>
                     }
 <!--                    <div fNode fDragHandle   [fNodePosition]="{ x: 0, y: 0 }" fNodeOutput fOutputId="output1" fOutputConnectableSide="right">Drag me</div>-->
 <!--                    <div fNode fDragHandle [fNodePosition]="{ x: 244, y: 24 }" fNodeInput fInputId="input1" fInputConnectableSide="left">Drag me </div>-->

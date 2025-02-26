@@ -23,6 +23,15 @@ import {MatChipRow} from "@angular/material/chips";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
 import {FSelectionChangeEvent} from "@foblex/flow"
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatTable
+} from "@angular/material/table";
 
 export interface Workflow {
   name: string;
@@ -81,7 +90,17 @@ export interface ActionBlock extends Block {
     NgForOf,
     MatChipRow,
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatHeaderRowDef
   ],
   templateUrl: './action-config.component.html',
   styleUrls: ['./action-config.component.css','./action-config.component.scss'],
@@ -131,8 +150,6 @@ export class ActionConfigComponent {
   }
 
   ngAfterViewInit() {
-    // Get the Flow instance from the <f-flow> element
-
     this.fFlow.fLoaded.subscribe((data) => {
       console.warn(data);
     });
@@ -240,5 +257,17 @@ export class ActionConfigComponent {
 
   onSelectionChange(event: FSelectionChangeEvent) {
     console.warn(event)
+  }
+
+  getDataSource(block: Block) {
+    switch (block.type){
+      case BlockType.OUTPUT_DATA:
+        return (block as OutputDataBlock).data.fields
+      case BlockType.INPUT_DATA:
+        return (block as InputDataBlock).data.fields
+      default:
+        console.error("invalid block type");
+        return []
+    }
   }
 }
