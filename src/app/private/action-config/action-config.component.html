@@ -27,8 +27,16 @@
                 <mat-expansion-panel-header>
                     <mat-panel-title>Actions</mat-panel-title>
                 </mat-expansion-panel-header>
-                <p>Your actions here</p>
-            </mat-expansion-panel>
+                <div class="panel-content" >
+                    <mat-form-field appearance="fill"  >
+                        <mat-label>Choose data</mat-label>
+                        <mat-select [formGroup]="fGroup" [formControl]="getFormControl('actionBlock')"   >
+                            <mat-option *ngFor="let action of getActions()" [value]="" >
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" (click)="addDataBlock()">Add block</button>
+                </div>            </mat-expansion-panel>
         </mat-accordion>
     </mat-sidenav>
     <mat-sidenav-content>
@@ -48,8 +56,11 @@
 <!--                    </f-connection>-->
                     @for (block of blocks; track block.key) {
                         <div  fNode fDragHandle  [fNodePosition]="block.position"  class="f-node">
-                            <div>{{getClassName(block)}}</div>
-                            <table *ngIf="block.type !== BlockType.ACTION" mat-table [dataSource]="getDataSource(block)!" class="mat-elevation-z8">
+                            <div  class="block-header">
+                                <div  class="block-title">{{getClassName(block)}}</div>
+                                <mat-slide-toggle  [checked]="getShowFields(block)" (change)="setShowFields(block, $event)"  ></mat-slide-toggle>
+                            </div>
+                            <table *ngIf="isDataBlockShown(block)" mat-table [dataSource]="getDataSource(block)!" class="mat-elevation-z8">
                                 <ng-container matColumnDef="fieldName">
                                     <th mat-header-cell *matHeaderCellDef> Field Name </th>
                                     <td mat-cell *matCellDef="let field"> {{ field.fieldName }} </td>

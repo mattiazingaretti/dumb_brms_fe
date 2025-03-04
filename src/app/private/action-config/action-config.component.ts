@@ -1,5 +1,12 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
-import {EFMarkerType, FCreateNodeEvent, FFlowComponent, FFlowModule, FZoomDirective} from "@foblex/flow";
+import {
+  EFMarkerType,
+  FCreateNodeEvent,
+  FFlowComponent,
+  FFlowModule,
+  FSelectionChangeEvent,
+  FZoomDirective
+} from "@foblex/flow";
 import {FooterComponent} from "../../shared/footer/footer.component";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -22,16 +29,19 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatChipRow} from "@angular/material/chips";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
-import {FSelectionChangeEvent} from "@foblex/flow"
 import {
   MatCell,
   MatCellDef,
   MatColumnDef,
   MatHeaderCell,
   MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
   MatTable
 } from "@angular/material/table";
+import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
 
 export interface Workflow {
   name: string;
@@ -52,11 +62,13 @@ export interface Block{
 
 export interface InputDataBlock extends Block {
   type: BlockType.INPUT_DATA;
+  showFields: boolean,
   data: RuleInputResponseDTO ;
 }
 
 export interface OutputDataBlock extends Block {
   type: BlockType.OUTPUT_DATA;
+  showFields: boolean,
   data: RuleInputResponseDTO ;
 }
 
@@ -100,7 +112,9 @@ export interface ActionBlock extends Block {
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatHeaderRowDef
+    MatHeaderRowDef,
+    MatSlideToggle,
+    MatSlideToggle
   ],
   templateUrl: './action-config.component.html',
   styleUrls: ['./action-config.component.css','./action-config.component.scss'],
@@ -189,7 +203,8 @@ export class ActionConfigComponent {
   private buildForm() {
     this.fGroup = new FormGroup({
       workflowName: new FormControl('[Workflow Name]', [Validators.required]),
-      dataBlock: new FormControl(null, [Validators.required])
+      dataBlock: new FormControl(null, [Validators.required]),
+      actionBlock: new FormControl(null, [Validators.required]),
     })
   }
 
@@ -238,9 +253,9 @@ export class ActionConfigComponent {
     }
 
     if(this.isInput(data)) {
-      this.blocks.push({name: selectedData,key: `input_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.INPUT_DATA, data: data} as Block);
+      this.blocks.push({showFields: false, name: selectedData,key: `input_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.INPUT_DATA, data: data} as Block);
     }else {
-        this.blocks.push({name: selectedData,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
+        this.blocks.push({showFields: false,name: selectedData,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
     }
     this.fFlow.redraw();
     this.cdr.detectChanges();
@@ -250,7 +265,7 @@ export class ActionConfigComponent {
   onCreateNode($event: FCreateNodeEvent<any>) {
     this.cdr.markForCheck();
   }
-
+  //This should be in a service class
   getClassName(block: Block) {
     return block.type === BlockType.INPUT_DATA ? (block as InputDataBlock).data?.className||'' : (block as OutputDataBlock).data?.className||''  ;
   }
@@ -270,4 +285,21 @@ export class ActionConfigComponent {
         return []
     }
   }
+
+  isDataBlockShown(block: Block) {
+     return block.type !== BlockType.ACTION && (block as InputDataBlock | OutputDataBlock).showFields
+  }
+
+  getShowFields(block: Block) {
+    return block.type !== BlockType.ACTION ? (block as InputDataBlock | OutputDataBlock).showFields : false
+  }
+
+  setShowFields(block: Block, $event: MatSlideToggleChange) {
+    (block as InputDataBlock | OutputDataBlock).showFields = $event.checked
+  }
+
+  getActions() {
+    return undefined;
+  }
+
 }

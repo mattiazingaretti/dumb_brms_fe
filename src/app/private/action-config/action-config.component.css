@@ -124,3 +124,15 @@ mat-chip-row {
         padding: 6px 8px; /* Reduce padding for smaller screens */
     }
 }
+
+.block-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    justify-content: space-between; /* Distribute space between title and toggle */
+}
+
+.block-title {
+    flex-grow: 1; /* Allow the title to take up available space */
+    margin-right: 10px;
+}
