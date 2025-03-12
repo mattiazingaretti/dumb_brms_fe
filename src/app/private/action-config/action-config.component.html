@@ -12,10 +12,10 @@
                     <mat-form-field appearance="fill"  >
                         <mat-label>Choose data</mat-label>
                         <mat-select [formGroup]="fGroup" [formControl]="getFormControl('dataBlock')"   >
-                            <mat-option *ngFor="let dataType of getDataTypes()" [value]="dataType?.className" >
-                                {{dataType.className}}
-                                <mat-chip-row *ngIf="isInput(dataType)" color="primary">Input</mat-chip-row>
-                                <mat-chip-row *ngIf="!isInput(dataType)" color="accent">Output</mat-chip-row>
+                            <mat-option *ngFor="let condition of dataDropDownOptions" [value]="condition.class" >
+                                {{condition.idCondition}} : {{condition.class}}
+                                <mat-chip-row *ngIf="isInputCondition(condition.class)" color="primary">Input</mat-chip-row>
+                                <mat-chip-row *ngIf="!isInputCondition(condition.class)" color="accent">Output</mat-chip-row>
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -36,7 +36,8 @@
                         </mat-select>
                     </mat-form-field>
                     <button mat-raised-button color="primary" (click)="addDataBlock()">Add block</button>
-                </div>            </mat-expansion-panel>
+                </div>
+            </mat-expansion-panel>
         </mat-accordion>
     </mat-sidenav>
     <mat-sidenav-content>

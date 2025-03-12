@@ -162,11 +162,16 @@ export class RuleDesignComponent {
   }
 
   private saveRules() {
-    localStorage.setItem(LocalKeys.RULES, JSON.stringify(this.rules));
+    localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
   }
 
   onRulesChange(conditions: Condition[], rule: Rule) {
-    rule.conditions = conditions;
+    const changedRuleIdx = this.rules.findIndex((r)=> r.idRule === rule.idRule)
+    if(changedRuleIdx === -1){
+      console.error("Faield to find rule for which we need to save conditons  ");
+      return;
+    }
+    this.rules.at(changedRuleIdx)!.conditions = conditions
     this.rules = [...this.rules];
     this.saveRules();
   }

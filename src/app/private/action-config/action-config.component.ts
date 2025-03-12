@@ -42,6 +42,7 @@ import {
   MatTable
 } from "@angular/material/table";
 import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
+import {Condition, Rule} from "../rule-design/rule-design.component";
 
 export interface Workflow {
   name: string;
@@ -55,6 +56,7 @@ export enum BlockType {
 
 export interface Block{
   name: string,
+  idCondition: string,
   type: BlockType;
   key: string,
   position: {x: number, y: number}
@@ -145,6 +147,8 @@ export class ActionConfigComponent {
   blocks: Block[] = [];
 
   private flowInstance: any;
+  rule?: Rule;
+  dataDropDownOptions: Condition[] = [];
 
   constructor(
       public route : ActivatedRoute,
@@ -157,6 +161,7 @@ export class ActionConfigComponent {
 
     this.buildForm();
     this.getRuleData();
+    this.fillNodeDropDownOptions();
   }
 
   ngOnInit() {
@@ -223,8 +228,9 @@ export class ActionConfigComponent {
     });
   }
 
-  getDataTypes() {
-    return [...this.ruleData?.inputData||[], ...this.ruleData?.outputData||[]]
+
+  isInputCondition(conditionClass?: string): boolean{
+    return this.ruleData?.inputData?.map((id)=> id.className).includes(conditionClass as string) || false;
   }
 
   isInput(dataType: RuleInputResponseDTO | RuleOutputResponseDTO) {
@@ -239,6 +245,13 @@ export class ActionConfigComponent {
       return;
     }
     const selectedData : string = dataBlockControl.value as string;
+    const selectedCondition = this.dataDropDownOptions.find((c)=> c.class === selectedData)
+
+    if(selectedCondition === undefined){
+        console.error("Failed to find selected condition");
+        return;
+    }
+
     let data: RuleOutputResponseDTO | RuleInputResponseDTO | undefined = undefined
     let inData: RuleInputResponseDTO | undefined = this.ruleData?.inputData?.find((id)=> id.className === selectedData)
     let outData :RuleOutputResponseDTO | undefined= this.ruleData?.outputData?.find((id)=> id.className === selectedData)
@@ -253,10 +266,12 @@ export class ActionConfigComponent {
     }
 
     if(this.isInput(data)) {
-      this.blocks.push({showFields: false, name: selectedData,key: `input_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.INPUT_DATA, data: data} as Block);
+      this.blocks.push({showFields: false,idCondition: selectedCondition.idCondition, name: `${selectedCondition.idCondition} : ${selectedData}`,key: `input_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.INPUT_DATA, data: data} as Block);
     }else {
-        this.blocks.push({showFields: false,name: selectedData,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
+        this.blocks.push({showFields: false,idCondition: selectedCondition.idCondition, name: `${selectedCondition.idCondition} : ${selectedData}` ,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
     }
+    //remove from available options when it is created.
+    this.dataDropDownOptions = this.dataDropDownOptions.filter((c)=> c.class !== selectedData)
     this.fFlow.redraw();
     this.cdr.detectChanges();
     this.cdr.markForCheck();
@@ -267,7 +282,7 @@ export class ActionConfigComponent {
   }
   //This should be in a service class
   getClassName(block: Block) {
-    return block.type === BlockType.INPUT_DATA ? (block as InputDataBlock).data?.className||'' : (block as OutputDataBlock).data?.className||''  ;
+    return block.type === BlockType.INPUT_DATA ? (block as InputDataBlock).name ||'' : (block as OutputDataBlock).name ||''  ;
   }
 
   onSelectionChange(event: FSelectionChangeEvent) {
@@ -300,6 +315,18 @@ export class ActionConfigComponent {
 
   getActions() {
     return undefined;
+  }
+
+  private fillNodeDropDownOptions() {
+    if(!this.ruleId || !this.projectId) {
+        console.error("Missing ids for project or rule");
+        return;
+    }
+
+    this.ruleDataCacheService.getCachedRuleConditions(parseInt(this.projectId!), parseInt(this.ruleId!)).subscribe((rule: Rule) => {
+      this.rule = rule;
+      this.dataDropDownOptions = rule.conditions||[];
+    });
   }
 
 }
