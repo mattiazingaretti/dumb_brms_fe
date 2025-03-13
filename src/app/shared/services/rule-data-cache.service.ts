@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {DesignControllerService} from "../../api/api/designController.service";
 import {Observable, of, tap} from "rxjs";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
-import {LocalKeys} from "../../app.routes";
 import {Rule} from "../../private/rule-design/rule-design.component";
 
 export  const RULE_CACHE_KEY ={

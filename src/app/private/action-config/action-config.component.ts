@@ -43,6 +43,10 @@ import {
 } from "@angular/material/table";
 import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
 import {Condition, Rule} from "../rule-design/rule-design.component";
+import {ActionControllerService} from "../../api/api/actionController.service";
+import {ActionWithParamsResponseDTO} from "../../api/model/actionWithParamsResponseDTO";
+import {ActionParamResponseDTO} from "../../api/model/actionParamResponseDTO";
+import {B} from "@angular/cdk/keycodes";
 
 export interface Workflow {
   name: string;
@@ -56,7 +60,6 @@ export enum BlockType {
 
 export interface Block{
   name: string,
-  idCondition: string,
   type: BlockType;
   key: string,
   position: {x: number, y: number}
@@ -64,18 +67,22 @@ export interface Block{
 
 export interface InputDataBlock extends Block {
   type: BlockType.INPUT_DATA;
+  idCondition: string,
   showFields: boolean,
-  data: RuleInputResponseDTO ;
+  data: RuleInputResponseDTO;
 }
 
 export interface OutputDataBlock extends Block {
   type: BlockType.OUTPUT_DATA;
   showFields: boolean,
-  data: RuleInputResponseDTO ;
+  idCondition: string,
+  data: RuleOutputResponseDTO ;
 }
 
 export interface ActionBlock extends Block {
     type: BlockType.ACTION;
+    input: ActionParamResponseDTO[];
+    output: ActionParamResponseDTO[];
 }
 
 @Component({
@@ -149,10 +156,12 @@ export class ActionConfigComponent {
   private flowInstance: any;
   rule?: Rule;
   dataDropDownOptions: Condition[] = [];
+  actionsDropDownOptions: ActionWithParamsResponseDTO[] = [];
 
   constructor(
       public route : ActivatedRoute,
       public ruleDataCacheService : RuleDataCacheService,
+      public actionControllerService : ActionControllerService,
       public router : Router,
       private cdr: ChangeDetectorRef
   ) {
@@ -170,7 +179,6 @@ export class ActionConfigComponent {
 
   ngAfterViewInit() {
     this.fFlow.fLoaded.subscribe((data) => {
-      console.warn(data);
     });
     this.fFlow.selectAll()
     console.log('Flow Module', FFlowModule);
@@ -237,7 +245,15 @@ export class ActionConfigComponent {
     return this.ruleData?.inputData?.includes(dataType as RuleInputResponseDTO); //TODO make a more effifcient check like adding the input/output property to the DTO.
   }
 
-  addDataBlock() {
+  addBlock(action: boolean = false) {
+    action ? this.addActionBlock() : this.addDataBlock();
+
+    this.fFlow.redraw();
+    this.cdr.detectChanges();
+    this.cdr.markForCheck();
+  }
+
+  addDataBlock(){
     const dataBlockControl = this.getFormControl('dataBlock');
 
     if(dataBlockControl.invalid){
@@ -248,8 +264,8 @@ export class ActionConfigComponent {
     const selectedCondition = this.dataDropDownOptions.find((c)=> c.class === selectedData)
 
     if(selectedCondition === undefined){
-        console.error("Failed to find selected condition");
-        return;
+      console.error("Failed to find selected condition");
+      return;
     }
 
     let data: RuleOutputResponseDTO | RuleInputResponseDTO | undefined = undefined
@@ -268,13 +284,41 @@ export class ActionConfigComponent {
     if(this.isInput(data)) {
       this.blocks.push({showFields: false,idCondition: selectedCondition.idCondition, name: `${selectedCondition.idCondition} : ${selectedData}`,key: `input_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.INPUT_DATA, data: data} as Block);
     }else {
-        this.blocks.push({showFields: false,idCondition: selectedCondition.idCondition, name: `${selectedCondition.idCondition} : ${selectedData}` ,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
+      this.blocks.push({showFields: false,idCondition: selectedCondition.idCondition, name: `${selectedCondition.idCondition} : ${selectedData}` ,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
     }
     //remove from available options when it is created.
     this.dataDropDownOptions = this.dataDropDownOptions.filter((c)=> c.class !== selectedData)
-    this.fFlow.redraw();
-    this.cdr.detectChanges();
-    this.cdr.markForCheck();
+  }
+
+  addActionBlock(){
+    const actionBlockControl = this.getFormControl('actionBlock');
+
+    if(actionBlockControl.invalid){
+      console.error("Data block Form is invalid");
+      return;
+    }
+    const selectedAction = actionBlockControl.value as string;
+    const action: ActionWithParamsResponseDTO | undefined = this.actionsDropDownOptions.find((a)=> a.actionName === selectedAction)
+
+    if(action === undefined){
+      console.error("Failed to find selected action");
+      return;
+    }
+    const inputParams: ActionParamResponseDTO[] = action.actionParams?.filter((p: ActionParamResponseDTO)=> p.paramDirection === ActionParamResponseDTO.ParamDirectionEnum.INPUT ) || []
+    const outputParams : ActionParamResponseDTO[] = action.actionParams?.filter((p: ActionParamResponseDTO)=> p.paramDirection === ActionParamResponseDTO.ParamDirectionEnum.OUTPUT) || []
+    const lastId = this.blocks.length
+
+    let toBePushed : ActionBlock = {
+      type: BlockType.ACTION,
+      key: `action_${lastId+1}`,
+      position: {x:200,y : 200},
+      name: action.actionName!,
+      input: inputParams,
+      output: outputParams
+    }
+    this.blocks.push(toBePushed as Block)
+    console.warn(this.blocks)
+
   }
 
   onCreateNode($event: FCreateNodeEvent<any>) {
@@ -286,10 +330,10 @@ export class ActionConfigComponent {
   }
 
   onSelectionChange(event: FSelectionChangeEvent) {
-    console.warn(event)
+    // console.warn(event)
   }
 
-  getDataSource(block: Block) {
+  getDataBlockDataSource(block: Block) {
     switch (block.type){
       case BlockType.OUTPUT_DATA:
         return (block as OutputDataBlock).data.fields
@@ -300,9 +344,22 @@ export class ActionConfigComponent {
         return []
     }
   }
+  getActionBlockDataSource(block: Block) {
+    switch (block.type){
+      case BlockType.ACTION:
+        return [...(block as ActionBlock).input , ...(block as ActionBlock).output]
+      default:
+        console.error("invalid block type");
+        return []
+    }
+  }
+
 
   isDataBlockShown(block: Block) {
      return block.type !== BlockType.ACTION && (block as InputDataBlock | OutputDataBlock).showFields
+  }
+  isActionBlockShown(block: Block) {
+    return block.type === BlockType.ACTION && ((block as ActionBlock).input.length > 0 || (block as ActionBlock).output.length > 0)
   }
 
   getShowFields(block: Block) {
@@ -311,10 +368,6 @@ export class ActionConfigComponent {
 
   setShowFields(block: Block, $event: MatSlideToggleChange) {
     (block as InputDataBlock | OutputDataBlock).showFields = $event.checked
-  }
-
-  getActions() {
-    return undefined;
   }
 
   private fillNodeDropDownOptions() {
@@ -327,6 +380,16 @@ export class ActionConfigComponent {
       this.rule = rule;
       this.dataDropDownOptions = rule.conditions||[];
     });
+
+    this.actionControllerService.getActionsWithParams().subscribe((actions: ActionWithParamsResponseDTO[]) => {
+        this.actionsDropDownOptions = actions;
+    });
   }
+
+
+  isInputParam(param: ActionParamResponseDTO) {
+    return param.paramDirection === ActionParamResponseDTO.ParamDirectionEnum.INPUT;
+  }
+
 
 }

@@ -9,10 +9,12 @@ import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {authInterceptorInterceptor} from "./shared/auth-interceptor.interceptor";
 import {ProjectControllerService} from "./api/api/projectController.service";
 import {DesignControllerService} from "./api/api/designController.service";
+import {ActionControllerService} from "./api/api/actionController.service";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     AuthControllerService,
+    ActionControllerService,
     ProjectControllerService,
     DesignControllerService,
     { provide: CONFIGURATION_PARAMETERS, useValue: { basePath: 'http://localhost:8080', withCredentials: true } },

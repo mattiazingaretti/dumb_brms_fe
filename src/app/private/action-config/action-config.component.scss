@@ -16,6 +16,10 @@ f-flow {
 .f-node {
   @include app.node;
   border: 1px solid var(--node-border-color);
+  width: auto;
+  height: auto;
+  min-width: fit-content;
+  min-height: fit-content;
   &.f-selected {
     border: 1px solid var(--node-selected-border-color);
   }

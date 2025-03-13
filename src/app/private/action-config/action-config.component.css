@@ -111,7 +111,7 @@ mat-chip-row {
 
 .f-node {
     overflow-y: auto; /* Enable vertical scrolling if content overflows */
-    max-height: 300px; /* Limit the maximum height of the node */
+    /*max-height: 300px; !* Limit the maximum height of the node *!*/
 }
 
 @media (max-width: 768px) {
@@ -135,4 +135,16 @@ mat-chip-row {
 .block-title {
     flex-grow: 1; /* Allow the title to take up available space */
     margin-right: 10px;
+}
+
+.param-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.param-content {
+    display: flex;
+    align-items: center;
+    gap: 3px; /* Adds space between the chip and the label */
 }
