@@ -1,34 +1,35 @@
-@use "../../app.component" as app;
+//@use "../../app.component" as app;
+//
+//
+//@include app.connector;
+//f-flow {
+//  border:  1px solid black;
+//  border-radius: 10px; /* Rounded corners */
+//  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+//  @include app.connection;
+//  height: 80%;
+//  width: 95%;
+//  display: block;
+//  @include app.connection;
+//}
+//
+//
+//.f-node {
+//  @include app.node;
+//  border: 1px solid var(--node-border-color);
+//  //width: auto;
+//  //height: auto;
+//  min-width: fit-content;
+//  min-height: fit-content;
+//  &.f-selected {
+//    border: 1px solid var(--node-selected-border-color);
+//  }
+//}
 
-
-
-f-flow {
-  border:  1px solid black;
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
-  @include app.connection;  height: 80%;
-  width: 95%;
-  display: block;
-  @include app.connection;
-}
-
-
-.f-node {
-  @include app.node;
-  border: 1px solid var(--node-border-color);
-  width: auto;
-  height: auto;
-  min-width: fit-content;
-  min-height: fit-content;
-  &.f-selected {
-    border: 1px solid var(--node-selected-border-color);
-  }
-}
-
-:host {
-  @include app.connection;
-  --connection-gradient-2: var(--connection-gradient-2);
-}
+//:host {
+//  @include app.connection;
+//  --connection-gradient-2: var(--connection-gradient-2);
+//}
 
 .panel-content {
   display: flex;

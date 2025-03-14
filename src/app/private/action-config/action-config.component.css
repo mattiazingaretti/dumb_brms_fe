@@ -5,6 +5,7 @@
 .flow-wrapper {
     width: 100%;
     height: 100%;
+    margin-top: 5rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,12 +31,12 @@ f-flow {
     border: 1px solid black;
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    height: 80vh; /* Use viewport height for dynamic sizing */
-    width: 95%; /* Ensure the canvas takes up most of the screen */
-    display: flex; /* Use flexbox for better alignment */
-    justify-content: center; /* Center content horizontally */
-    align-items: flex-start; /* Align content at the top */
-    overflow: auto; /* Enable scrolling if content overflows */
+    /*height: 80vh; !* Use viewport height for dynamic sizing *!*/
+    /*width: 95%; !* Ensure the canvas takes up most of the screen *!*/
+    /*display: flex; !* Use flexbox for better alignment *!*/
+    /*justify-content: center; !* Center content horizontally *!*/
+    /*align-items: flex-start; !* Align content at the top *!*/
+    /*overflow: auto; !* Enable scrolling if content overflows *!*/
 }
 
 f-canvas {
@@ -53,7 +54,7 @@ f-canvas {
     min-height: 100px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: absolute;
-    overflow: hidden;
+    /*overflow: hidden;*/
 
     &.f-selected {
         border: 2px solid var(--node-selected-border-color, #007bff);

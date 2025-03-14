@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Renderer2, ViewChild} from '@angular/core';
 import {
-  EFMarkerType,
+  EFMarkerType, FCanvasChangeEvent, FCanvasComponent, FCreateConnectionEvent,
   FCreateNodeEvent,
   FFlowComponent,
   FFlowModule,
@@ -46,7 +46,8 @@ import {Condition, Rule} from "../rule-design/rule-design.component";
 import {ActionControllerService} from "../../api/api/actionController.service";
 import {ActionWithParamsResponseDTO} from "../../api/model/actionWithParamsResponseDTO";
 import {ActionParamResponseDTO} from "../../api/model/actionParamResponseDTO";
-import {B} from "@angular/cdk/keycodes";
+import {IPoint} from "@foblex/core";
+import {ActionConfigCanvasComponent} from "../canvas/action-config-canvas/action-config-canvas.component";
 
 export interface Workflow {
   name: string;
@@ -62,7 +63,7 @@ export interface Block{
   name: string,
   type: BlockType;
   key: string,
-  position: {x: number, y: number}
+  position: IPoint
 }
 
 export interface InputDataBlock extends Block {
@@ -123,7 +124,8 @@ export interface ActionBlock extends Block {
     MatRow,
     MatHeaderRowDef,
     MatSlideToggle,
-    MatSlideToggle
+    MatSlideToggle,
+    ActionConfigCanvasComponent
   ],
   templateUrl: './action-config.component.html',
   styleUrls: ['./action-config.component.css','./action-config.component.scss'],
@@ -140,12 +142,21 @@ export class ActionConfigComponent {
   @ViewChild(FZoomDirective, { static: true })
   fZoomDirective!: FZoomDirective;
 
+  @ViewChild(FCanvasComponent, { static: true })
+  fCanvasComponent!: FCanvasComponent;
+
+
   @ViewChild(FFlowComponent, { static: true })
   fFlow!: FFlowComponent;
 
   @ViewChild('flow') flowElement!: ElementRef;
 
-  workflow?: Workflow;
+  @ViewChild('blockNode', { static: true }) blockNode!: ElementRef;
+
+
+  connections: { outputId: string, inputId: string }[] = [];
+
+
   public fGroup!: FormGroup;
 
   projectId: string | null;
@@ -163,7 +174,8 @@ export class ActionConfigComponent {
       public ruleDataCacheService : RuleDataCacheService,
       public actionControllerService : ActionControllerService,
       public router : Router,
-      private cdr: ChangeDetectorRef
+      private cdr: ChangeDetectorRef,
+      private renderer: Renderer2
   ) {
     this.projectId = this.route.snapshot.queryParamMap.get('projectId');
     this.ruleId = this.route.snapshot.queryParamMap.get('ruleId');
@@ -179,10 +191,12 @@ export class ActionConfigComponent {
 
   ngAfterViewInit() {
     this.fFlow.fLoaded.subscribe((data) => {
+      // this.fZoomDirective.reset();
+      // this.fFlow.redraw();
+      // this.cdr.detectChanges();
+      // this.cdr.markForCheck();
     });
-    this.fFlow.selectAll()
-    console.log('Flow Module', FFlowModule);
-    console.log('Flow Module');
+    // this.fFlow.selectAll()
   }
 
   zoomIn(): void {
@@ -194,11 +208,6 @@ export class ActionConfigComponent {
 
   reset(): void {
     this.fZoomDirective.reset();
-  }
-
-
-  onFunctionSelect(functionName: string): void {
-    console.log(`Selected function: ${functionName}`);
   }
 
   toggleSidenav() {
@@ -329,9 +338,6 @@ export class ActionConfigComponent {
     return block.type === BlockType.INPUT_DATA ? (block as InputDataBlock).name ||'' : (block as OutputDataBlock).name ||''  ;
   }
 
-  onSelectionChange(event: FSelectionChangeEvent) {
-    // console.warn(event)
-  }
 
   getDataBlockDataSource(block: Block) {
     switch (block.type){
@@ -392,4 +398,26 @@ export class ActionConfigComponent {
   }
 
 
+  addConnection(event: FCreateConnectionEvent) {
+    if(!event.fInputId) {
+      return;
+    }
+    this.connections.push({ outputId: event.fOutputId, inputId: event.fInputId });
+    this.cdr.detectChanges();
+  }
+
+
+  onLoaded($event: void) {
+    this.fCanvasComponent.resetScaleAndCenter()
+
+  }
+
+  onCanvasChange($event: FCanvasChangeEvent) {
+    console.warn("CANVAS" , $event)
+  }
+
+  onLoadedFFLow($event: void) {
+    console.warn("FLOW " , $event)
+    console.warn("FLOW " ,this.fFlow.getState())
+  }
 }
