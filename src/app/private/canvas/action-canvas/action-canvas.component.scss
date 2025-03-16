@@ -4,6 +4,11 @@
   width: 100%;
   height: 100%;
 }
+
+@include app.examples-toolbar;
+@include app.connector;
+@include app.connection-marker;
+
 .connectors_layout{
   display: flex;
   flex-direction: row;
@@ -16,11 +21,21 @@
     justify-content: space-between;
     align-items: center;
 }
+.examples-toolbar{
+  top: 7%;
+  right:2%;
+}
 
 .f-flow {
   @include app.connection;
-  @include app.connection-marker;
-
+  .f-connection {
+    .f-connection-selection {
+      stroke-width: 20;
+    }
+    &:hover {
+      stroke: var(--minimap-view-color);
+    }
+  }
   .f-background {
     line {
       stroke: var(--background-element-color);
@@ -31,6 +46,15 @@
   }
 }
 
+.connection-marker{
+    @include app.connection;
+    @include app.connection-marker;
+    @include app.connector;
+    @include app.minimap;
+    &.f-selected {
+      border: 1px solid var(--node-selected-border-color);
+    }
+}
 
 .f-node-output {
   right: -5%;
@@ -46,11 +70,12 @@
   @include app.minimap;
   width: auto;
   padding: 1px;
+  &.f-selected {
+    border: 1px solid var(--node-selected-border-color);
+  }
 }
 connection-markers {
   @include app.connection;
   @include app.connection-marker;
 }
 
-@include app.connector;
-@include app.examples-toolbar;

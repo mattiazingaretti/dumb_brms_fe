@@ -135,6 +135,9 @@ export class ActionConfigComponent {
 
   ngOnInit() {
     this.getRuleData();
+    this.blocksSharingService.getBlocks().subscribe(blocks => {
+        this.blocks = blocks;
+    })
   }
 
 

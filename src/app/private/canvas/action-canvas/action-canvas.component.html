@@ -1,4 +1,5 @@
-<f-flow #flowComponent fDraggable  (fCreateConnection)="addConnection($event)">
+<f-flow #flowComponent fDraggable  (fCreateConnection)="addConnection($event)" (fSelectionChange)="onSelectionchange($event)">
+    <f-selection-area></f-selection-area>
     <f-canvas #flowCanvas fZoom>
         <f-connection-for-create></f-connection-for-create>
         @for (connection of connections; track connection.id) {
@@ -7,7 +8,7 @@
             </f-connection>
         }
         @for (block of this.blocksSharingService.getBlocks() | async; track block.key) {
-            <div  fNode fDragHandle [fNodePosition]="block.position" >
+            <div  fNode fDragHandle [fNodePosition]="block.position" [fNodeId]="block.key" >
                 @switch (block.type){
                     @case(BlockType.ACTION){
                         <mat-label>  {{ block.name }}</mat-label>
@@ -23,14 +24,14 @@
                                 <td mat-cell *matCellDef="let param" >
                                     <ng-container *ngIf="isInputParam(param)">
                                         <div class="action_connectors_layout">
-                                            <div fNodeInput class="action_connectors_input" [fInputId]="block.type+'_input_id'+block.name+'_'+param.paramType+'_'+param.paramName"  ></div>
+                                            <div fNodeInput class="action_connectors_input" [fInputId]="block.key+block.type+'_input_id'+block.name+'_'+param.paramType+'_'+param.paramName"  ></div>
                                             <mat-chip-row  color="primary">INPUT</mat-chip-row>
                                         </div>
                                     </ng-container>
                                     <ng-container *ngIf="!isInputParam(param)">
                                         <div class="action_connectors_layout">
                                             <mat-chip-row  color="accent">OUTPUT</mat-chip-row>
-                                            <div fNodeOutput class="action_connectors_output"  [fOutputId]="block.type+'_output_id'+block.name+'_'+param.paramType+'_'+param.paramName" ></div>
+                                            <div fNodeOutput class="action_connectors_output"  [fOutputId]="block.key+block.type+'_output_id'+block.name+'_'+param.paramType+'_'+param.paramName" ></div>
                                         </div>
                                     </ng-container>
                                 </td>
@@ -50,7 +51,7 @@
                                 <th mat-header-cell *matHeaderCellDef>Name</th>
                                 <td mat-cell *matCellDef="let field" >
                                     <mat-label class="connectors_layout">
-                                        <div fNodeInput [fInputId]="block.type+'_input_id'+block.name+'_'+field.fieldType+'_'+field.fieldName"  ></div> {{ field.fieldName }}
+                                        <div fNodeInput [fInputId]="block.key+block.type+'_input_id'+block.name+'_'+field.fieldType+'_'+field.fieldName"  ></div> {{ field.fieldName }}
                                     </mat-label>
                                 </td>
                             </ng-container>
@@ -59,7 +60,7 @@
                                 <th mat-header-cell *matHeaderCellDef>Type</th>
                                 <td  mat-cell *matCellDef="let field">
                                     <mat-label class="connectors_layout">{{ field.fieldType }}
-                                        <div fNodeOutput  [fOutputId]="block.type+'_output_id'+block.name+'_'+field.fieldType+'_'+field.fieldName" ></div>
+                                        <div fNodeOutput  [fOutputId]="block.key+block.type+'_output_id'+block.name+'_'+field.fieldType+'_'+field.fieldName" ></div>
                                     </mat-label>
                                 </td>
                             </ng-container>
@@ -75,7 +76,7 @@
                                 <th mat-header-cell *matHeaderCellDef>Name</th>
                                 <td mat-cell *matCellDef="let field">
                                     <mat-label class="connectors_layout">
-                                        <div fNodeInput [fInputId]="block.type+'_input_id'+block.name+'_'+field.fieldType+'_'+field.fieldName"  ></div> {{ field.fieldName }}
+                                        <div fNodeInput [fInputId]="block.key+block.type+'_input_id'+block.name+'_'+field.fieldType+'_'+field.fieldName"  ></div> {{ field.fieldName }}
                                     </mat-label>
                                 </td>
                             </ng-container>
@@ -84,7 +85,7 @@
                                 <th mat-header-cell *matHeaderCellDef>Type</th>
                                 <td mat-cell *matCellDef="let field">
                                     <mat-label class="connectors_layout">{{ field.fieldType }}
-                                        <div fNodeOutput  [fOutputId]="block.type+'_output_id'+block.name+'_'+field.fieldType+'_'+field.fieldName" ></div>
+                                        <div fNodeOutput  [fOutputId]="block.key+block.type+'_output_id'+block.name+'_'+field.fieldType+'_'+field.fieldName" ></div>
                                     </mat-label>
                                 </td>
                             </ng-container>
@@ -104,3 +105,8 @@
         <f-rect-pattern></f-rect-pattern>
     </f-background>
 </f-flow>
+<div class="examples-toolbar">
+    <button mat-raised-button [disabled]="!(selectedItems.blockIds.length > 0 || selectedItems.connectionsIds.length > 0)" class="f-button" color="accent" (click)="onDelete()">Delete Selected </button>
+    <button mat-raised-button class="f-button" (click)="onZoomIn()" color="primary">Zoom In</button>
+    <button mat-raised-button class="f-button" (click)="onZoomOut()" color="primary">Zoom Out</button>
+</div>

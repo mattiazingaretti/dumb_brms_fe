@@ -12,7 +12,7 @@ import {
   FCanvasComponent,
   FCreateConnectionEvent,
   FFlowComponent,
-  FFlowModule,
+  FFlowModule, FSelectionChangeEvent,
   FZoomDirective
 } from "@foblex/flow";
 import {BlocksSharingService} from "../services/blocks-sharing.service";
@@ -30,6 +30,7 @@ import {
 import {MatChipRow} from "@angular/material/chips";
 import {ActionParamResponseDTO} from "../../../api/model/actionParamResponseDTO";
 import {MatIcon} from "@angular/material/icon";
+import {MatButton} from "@angular/material/button";
 
 export interface Connection{
   id: string;
@@ -59,7 +60,8 @@ export interface Connection{
     MatHeaderCellDef,
     MatHeaderRowDef,
     MatRowDef,
-    MatIcon
+    MatIcon,
+    MatButton
   ],
   templateUrl: './action-canvas.component.html',
   styleUrl: './action-canvas.component.scss',
@@ -73,9 +75,13 @@ export class ActionCanvasComponent {
 
   blocks: Block[] = [];
   connections: Connection[] = [];
+  idsMap: {[key: string]: Block} = {};
 
   @ViewChild('flowComponent', {static: true}) flowComponent!: FFlowComponent;
   @ViewChild('flowCanvas', {static: true}) flowCanvas!: FCanvasComponent;
+  @ViewChild(FZoomDirective, { static: true }) fZoom!: FZoomDirective;
+
+  selectedItems: {connectionsIds: string[], blockIds: string[]}= {blockIds: [], connectionsIds: []};
 
   constructor(
       public blocksSharingService: BlocksSharingService,
@@ -131,7 +137,39 @@ export class ActionCanvasComponent {
     }
     const lastId = this.connections.length
     this.connections.push({ id: `connection_${lastId+1}`,to: event.fOutputId, from: event.fInputId });
-    console.warn("connection", this.connections);
     this.changeDetectorRef.detectChanges();
   }
+
+
+  onSelectionchange($event: FSelectionChangeEvent) {
+    this.selectedItems = {connectionsIds: $event.fConnectionIds, blockIds: $event.fNodeIds};
+    this.changeDetectorRef.detectChanges()
+}
+
+
+
+  onZoomOut() {
+    this.fZoom.zoomOut();
+  }
+
+  onZoomIn() {
+    this.fZoom.zoomIn();
+  }
+
+  onZoomReset() {
+    this.fZoom.reset();
+  }
+
+
+  onDelete() {
+    this.blocks = this.blocks.filter((block) => ! this.selectedItems.blockIds.includes(block.key));
+    console.warn(this.blocks)
+    this.blocksSharingService.setBlocks(this.blocks);
+    this.selectedItems.blockIds.forEach((id) => {
+      this.connections = this.connections.filter((connection) => !(connection.from.includes(id) || connection.to.includes(id)))
+    })
+    this.flowCanvas.redraw();
+    this.changeDetectorRef.detectChanges()
+  }
+
 }
