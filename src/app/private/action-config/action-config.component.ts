@@ -1,12 +1,5 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Renderer2, ViewChild} from '@angular/core';
-import {
-  EFMarkerType, FCanvasChangeEvent, FCanvasComponent, FCreateConnectionEvent,
-  FCreateNodeEvent,
-  FFlowComponent,
-  FFlowModule,
-  FSelectionChangeEvent,
-  FZoomDirective
-} from "@foblex/flow";
+import {EFMarkerType, FCanvasComponent, FFlowComponent, FFlowModule, FZoomDirective} from "@foblex/flow";
 import {FooterComponent} from "../../shared/footer/footer.component";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -29,25 +22,13 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatChipRow} from "@angular/material/chips";
 import {RuleInputResponseDTO} from "../../api/model/ruleInputResponseDTO";
 import {RuleOutputResponseDTO} from "../../api/model/ruleOutputResponseDTO";
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow,
-  MatRowDef,
-  MatTable
-} from "@angular/material/table";
-import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
 import {Condition, Rule} from "../rule-design/rule-design.component";
 import {ActionControllerService} from "../../api/api/actionController.service";
 import {ActionWithParamsResponseDTO} from "../../api/model/actionWithParamsResponseDTO";
 import {ActionParamResponseDTO} from "../../api/model/actionParamResponseDTO";
 import {IPoint} from "@foblex/core";
-import {ActionConfigCanvasComponent} from "../canvas/action-config-canvas/action-config-canvas.component";
+import {ActionCanvasComponent} from "../canvas/action-canvas/action-canvas.component";
+import {BlocksSharingService} from "../canvas/services/blocks-sharing.service";
 
 export interface Workflow {
   name: string;
@@ -92,7 +73,6 @@ export interface ActionBlock extends Block {
   imports: [
     FFlowModule,
     FooterComponent,
-    FZoomDirective,
     MatButtonModule,
     MatIcon,
     MatSelect,
@@ -113,19 +93,7 @@ export interface ActionBlock extends Block {
     MatChipRow,
     NgIf,
     ReactiveFormsModule,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCellDef,
-    MatHeaderCell,
-    MatCellDef,
-    MatCell,
-    MatHeaderRow,
-    MatRowDef,
-    MatRow,
-    MatHeaderRowDef,
-    MatSlideToggle,
-    MatSlideToggle,
-    ActionConfigCanvasComponent
+    ActionCanvasComponent
   ],
   templateUrl: './action-config.component.html',
   styleUrls: ['./action-config.component.css','./action-config.component.scss'],
@@ -133,29 +101,9 @@ export interface ActionBlock extends Block {
 
 })
 export class ActionConfigComponent {
-  protected readonly BlockType = BlockType;
-  protected readonly eMarkerType = EFMarkerType;
 
   @ViewChild(MatSidenav, { static: true })
   sidenav!: MatSidenav;
-
-  @ViewChild(FZoomDirective, { static: true })
-  fZoomDirective!: FZoomDirective;
-
-  @ViewChild(FCanvasComponent, { static: true })
-  fCanvasComponent!: FCanvasComponent;
-
-
-  @ViewChild(FFlowComponent, { static: true })
-  fFlow!: FFlowComponent;
-
-  @ViewChild('flow') flowElement!: ElementRef;
-
-  @ViewChild('blockNode', { static: true }) blockNode!: ElementRef;
-
-
-  connections: { outputId: string, inputId: string }[] = [];
-
 
   public fGroup!: FormGroup;
 
@@ -164,7 +112,6 @@ export class ActionConfigComponent {
   ruleData?: RuleDataResponseDTO;
   blocks: Block[] = [];
 
-  private flowInstance: any;
   rule?: Rule;
   dataDropDownOptions: Condition[] = [];
   actionsDropDownOptions: ActionWithParamsResponseDTO[] = [];
@@ -173,6 +120,7 @@ export class ActionConfigComponent {
       public route : ActivatedRoute,
       public ruleDataCacheService : RuleDataCacheService,
       public actionControllerService : ActionControllerService,
+      public blocksSharingService : BlocksSharingService,
       public router : Router,
       private cdr: ChangeDetectorRef,
       private renderer: Renderer2
@@ -189,26 +137,6 @@ export class ActionConfigComponent {
     this.getRuleData();
   }
 
-  ngAfterViewInit() {
-    this.fFlow.fLoaded.subscribe((data) => {
-      // this.fZoomDirective.reset();
-      // this.fFlow.redraw();
-      // this.cdr.detectChanges();
-      // this.cdr.markForCheck();
-    });
-    // this.fFlow.selectAll()
-  }
-
-  zoomIn(): void {
-    this.fZoomDirective.zoomIn();
-  }
-  zoomOut(): void {
-    this.fZoomDirective.zoomOut();
-  }
-
-  reset(): void {
-    this.fZoomDirective.reset();
-  }
 
   toggleSidenav() {
     this.sidenav.toggle();
@@ -256,8 +184,6 @@ export class ActionConfigComponent {
 
   addBlock(action: boolean = false) {
     action ? this.addActionBlock() : this.addDataBlock();
-
-    this.fFlow.redraw();
     this.cdr.detectChanges();
     this.cdr.markForCheck();
   }
@@ -297,6 +223,8 @@ export class ActionConfigComponent {
     }
     //remove from available options when it is created.
     this.dataDropDownOptions = this.dataDropDownOptions.filter((c)=> c.class !== selectedData)
+
+    this.blocksSharingService.setBlocks(this.blocks);
   }
 
   addActionBlock(){
@@ -326,55 +254,9 @@ export class ActionConfigComponent {
       output: outputParams
     }
     this.blocks.push(toBePushed as Block)
-    console.warn(this.blocks)
-
+    this.blocksSharingService.setBlocks(this.blocks);
   }
 
-  onCreateNode($event: FCreateNodeEvent<any>) {
-    this.cdr.markForCheck();
-  }
-  //This should be in a service class
-  getClassName(block: Block) {
-    return block.type === BlockType.INPUT_DATA ? (block as InputDataBlock).name ||'' : (block as OutputDataBlock).name ||''  ;
-  }
-
-
-  getDataBlockDataSource(block: Block) {
-    switch (block.type){
-      case BlockType.OUTPUT_DATA:
-        return (block as OutputDataBlock).data.fields
-      case BlockType.INPUT_DATA:
-        return (block as InputDataBlock).data.fields
-      default:
-        console.error("invalid block type");
-        return []
-    }
-  }
-  getActionBlockDataSource(block: Block) {
-    switch (block.type){
-      case BlockType.ACTION:
-        return [...(block as ActionBlock).input , ...(block as ActionBlock).output]
-      default:
-        console.error("invalid block type");
-        return []
-    }
-  }
-
-
-  isDataBlockShown(block: Block) {
-     return block.type !== BlockType.ACTION && (block as InputDataBlock | OutputDataBlock).showFields
-  }
-  isActionBlockShown(block: Block) {
-    return block.type === BlockType.ACTION && ((block as ActionBlock).input.length > 0 || (block as ActionBlock).output.length > 0)
-  }
-
-  getShowFields(block: Block) {
-    return block.type !== BlockType.ACTION ? (block as InputDataBlock | OutputDataBlock).showFields : false
-  }
-
-  setShowFields(block: Block, $event: MatSlideToggleChange) {
-    (block as InputDataBlock | OutputDataBlock).showFields = $event.checked
-  }
 
   private fillNodeDropDownOptions() {
     if(!this.ruleId || !this.projectId) {
@@ -392,32 +274,4 @@ export class ActionConfigComponent {
     });
   }
 
-
-  isInputParam(param: ActionParamResponseDTO) {
-    return param.paramDirection === ActionParamResponseDTO.ParamDirectionEnum.INPUT;
-  }
-
-
-  addConnection(event: FCreateConnectionEvent) {
-    if(!event.fInputId) {
-      return;
-    }
-    this.connections.push({ outputId: event.fOutputId, inputId: event.fInputId });
-    this.cdr.detectChanges();
-  }
-
-
-  onLoaded($event: void) {
-    this.fCanvasComponent.resetScaleAndCenter()
-
-  }
-
-  onCanvasChange($event: FCanvasChangeEvent) {
-    console.warn("CANVAS" , $event)
-  }
-
-  onLoadedFFLow($event: void) {
-    console.warn("FLOW " , $event)
-    console.warn("FLOW " ,this.fFlow.getState())
-  }
 }

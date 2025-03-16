@@ -38,7 +38,6 @@ export class RuleDataCacheService {
   getCachedRuleConditions(idProject: number, idRule: number, force: boolean = false) : Observable<Rule>{
       const cacheKey = `${RULE_CACHE_KEY.RULES}${idProject}`;
       const cachedRules = localStorage.getItem(cacheKey);
-      console.warn(cachedRules)
       if (cachedRules && !force) {
           let rules : Rule[] = JSON.parse(cachedRules);
           const matchedRule = rules.find((rule: Rule) => rule.idRule === idRule);

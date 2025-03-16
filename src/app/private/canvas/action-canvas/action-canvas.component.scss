@@ -1,0 +1,56 @@
+@use "../../../app.component" as app;
+
+:host{
+  width: 100%;
+  height: 100%;
+}
+.connectors_layout{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.action_connectors_layout{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.f-flow {
+  @include app.connection;
+  @include app.connection-marker;
+
+  .f-background {
+    line {
+      stroke: var(--background-element-color);
+    }
+    circle {
+      fill: var(--background-element-color);
+    }
+  }
+}
+
+
+.f-node-output {
+  right: -5%;
+}
+.f-node-input {
+  right: 95%;
+}
+
+.f-node {
+  @include app.node;
+  @include app.connection-marker;
+  @include app.connection;
+  @include app.minimap;
+  width: auto;
+  padding: 1px;
+}
+connection-markers {
+  @include app.connection;
+  @include app.connection-marker;
+}
+
+@include app.connector;
+@include app.examples-toolbar;
