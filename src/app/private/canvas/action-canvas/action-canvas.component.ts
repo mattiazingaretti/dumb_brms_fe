@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {
   ActionBlock,
   Block,
@@ -12,25 +12,36 @@ import {
   FCanvasComponent,
   FCreateConnectionEvent,
   FFlowComponent,
-  FFlowModule, FSelectionChangeEvent,
+  FFlowModule,
+  FSelectionChangeEvent,
   FZoomDirective
 } from "@foblex/flow";
-import {BlocksSharingService} from "../services/blocks-sharing.service";
+import {
+  BlocksSharingService, ConnectorDir,
+  IdConnector,
+  IdConnectorDataField,
+  IdConnectorParam
+} from "../services/blocks-sharing.service";
 import {MatLabel} from "@angular/material/form-field";
 import {AsyncPipe, NgIf} from "@angular/common";
 import {
   MatCell,
   MatCellDef,
   MatColumnDef,
-  MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef,
-  MatRow, MatRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
   MatTable
 } from "@angular/material/table";
 import {MatChipRow} from "@angular/material/chips";
 import {ActionParamResponseDTO} from "../../../api/model/actionParamResponseDTO";
-import {MatIcon} from "@angular/material/icon";
 import {MatButton} from "@angular/material/button";
+import {Subscription} from "rxjs";
+import {RuleInputFieldResponseDTO} from "../../../api/model/ruleInputFieldResponseDTO";
+import {RuleOutputFieldResponseDTO} from "../../../api/model/ruleOutputFieldResponseDTO";
 
 export interface Connection{
   id: string;
@@ -60,7 +71,6 @@ export interface Connection{
     MatHeaderCellDef,
     MatHeaderRowDef,
     MatRowDef,
-    MatIcon,
     MatButton
   ],
   templateUrl: './action-canvas.component.html',
@@ -75,7 +85,8 @@ export class ActionCanvasComponent {
 
   blocks: Block[] = [];
   connections: Connection[] = [];
-  idsMap: {[key: string]: Block} = {};
+  idConnectos: IdConnector[] = [];
+  subjects: Subscription[] = [];
 
   @ViewChild('flowComponent', {static: true}) flowComponent!: FFlowComponent;
   @ViewChild('flowCanvas', {static: true}) flowCanvas!: FCanvasComponent;
@@ -90,12 +101,16 @@ export class ActionCanvasComponent {
   }
 
   ngOnInit(): void {
-    this.blocksSharingService.getBlocks().subscribe(blocks => {
+    const blockSub = this.blocksSharingService.getBlocks().subscribe(blocks => {
       this.blocks = blocks;
       this.flowComponent.redraw()
       this.flowCanvas.redraw();
-    })
+    });
 
+    const connectorSub = this.blocksSharingService.getConnectorMapping().subscribe((connectors) => {
+      this.idConnectos = connectors;
+    });
+    this.subjects.push(blockSub, connectorSub);
   }
 
 
@@ -142,6 +157,7 @@ export class ActionCanvasComponent {
 
 
   onSelectionchange($event: FSelectionChangeEvent) {
+    console.warn($event);
     this.selectedItems = {connectionsIds: $event.fConnectionIds, blockIds: $event.fNodeIds};
     this.changeDetectorRef.detectChanges()
 }
@@ -163,7 +179,6 @@ export class ActionCanvasComponent {
 
   onDelete() {
     this.blocks = this.blocks.filter((block) => ! this.selectedItems.blockIds.includes(block.key));
-    console.warn(this.blocks)
     this.blocksSharingService.setBlocks(this.blocks);
     this.selectedItems.blockIds.forEach((id) => {
       this.connections = this.connections.filter((connection) => !(connection.from.includes(id) || connection.to.includes(id)))
@@ -172,4 +187,38 @@ export class ActionCanvasComponent {
     this.changeDetectorRef.detectChanges()
   }
 
+  ngOnDestroy(): void {
+    this.subjects.forEach((sub) => sub.unsubscribe());
+  }
+
+
+  getParamConnectorId(block: Block, param: ActionParamResponseDTO, dir: ConnectorDir): string {
+
+    const id = this.idConnectos.filter((con)=> con.type === BlockType.ACTION).find((con)=>{
+      const actionConnector = con as IdConnectorParam;
+        return actionConnector.blockKey === block.key && actionConnector.paramName === param.paramName && actionConnector.paramType === param.paramType && actionConnector.paramDirection === param.paramDirection && actionConnector.connectorType === dir
+    })?.id
+
+    if(id === undefined){
+      console.error("failed to find id for param" + param.paramName);
+      return "";
+    }
+    return id;
+  }
+
+  getDataConnectorId(block: Block, field: RuleInputFieldResponseDTO | RuleOutputFieldResponseDTO, dir: ConnectorDir): string {
+    const id = this.idConnectos.filter((con)=> con.type === block.type).find((con)=>{
+      const dataConnector = con as IdConnectorDataField;
+      return dataConnector.blockKey === block.key && dataConnector.fieldName === field.fieldName && dataConnector.fieldType === field.fieldType && dataConnector.connectorType === dir
+    })?.id
+
+    if(id === undefined){
+      console.error("failed to find id for field");
+      return "";
+    }
+    return id;
+
+  }
+
+  protected readonly ConnectorDir = ConnectorDir;
 }
