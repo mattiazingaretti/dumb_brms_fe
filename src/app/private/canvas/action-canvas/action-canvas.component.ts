@@ -82,11 +82,13 @@ export class ActionCanvasComponent {
   protected readonly BlockType = BlockType;
   public eConnectionBehaviour = EFConnectionBehavior;
   protected readonly eMarkerType = EFMarkerType;
+  protected readonly ConnectorDir = ConnectorDir;
 
   blocks: Block[] = [];
   connections: Connection[] = [];
-  idConnectos: IdConnector[] = [];
+  idConnectors: IdConnector[] = [];
   subjects: Subscription[] = [];
+
 
   @ViewChild('flowComponent', {static: true}) flowComponent!: FFlowComponent;
   @ViewChild('flowCanvas', {static: true}) flowCanvas!: FCanvasComponent;
@@ -108,7 +110,7 @@ export class ActionCanvasComponent {
     });
 
     const connectorSub = this.blocksSharingService.getConnectorMapping().subscribe((connectors) => {
-      this.idConnectos = connectors;
+      this.idConnectors = connectors;
     });
     this.subjects.push(blockSub, connectorSub);
   }
@@ -189,12 +191,13 @@ export class ActionCanvasComponent {
 
   ngOnDestroy(): void {
     this.subjects.forEach((sub) => sub.unsubscribe());
+    this.blocksSharingService.setBlocks([]);
   }
 
 
   getParamConnectorId(block: Block, param: ActionParamResponseDTO, dir: ConnectorDir): string {
 
-    const id = this.idConnectos.filter((con)=> con.type === BlockType.ACTION).find((con)=>{
+    const id = this.idConnectors.filter((con)=> con.type === BlockType.ACTION).find((con)=>{
       const actionConnector = con as IdConnectorParam;
         return actionConnector.blockKey === block.key && actionConnector.paramName === param.paramName && actionConnector.paramType === param.paramType && actionConnector.paramDirection === param.paramDirection && actionConnector.connectorType === dir
     })?.id
@@ -207,7 +210,7 @@ export class ActionCanvasComponent {
   }
 
   getDataConnectorId(block: Block, field: RuleInputFieldResponseDTO | RuleOutputFieldResponseDTO, dir: ConnectorDir): string {
-    const id = this.idConnectos.filter((con)=> con.type === block.type).find((con)=>{
+    const id = this.idConnectors.filter((con)=> con.type === block.type).find((con)=>{
       const dataConnector = con as IdConnectorDataField;
       return dataConnector.blockKey === block.key && dataConnector.fieldName === field.fieldName && dataConnector.fieldType === field.fieldType && dataConnector.connectorType === dir
     })?.id
@@ -220,5 +223,15 @@ export class ActionCanvasComponent {
 
   }
 
-  protected readonly ConnectorDir = ConnectorDir;
+
+  getDataBlockConnectableInputs(block: Block, field: RuleInputFieldResponseDTO | RuleOutputFieldResponseDTO) {
+    const ids =  this.idConnectors
+        .filter((c)=> c.blockKey !== block.key)
+        .filter((c)=> {
+          return (c as IdConnectorDataField).fieldType === field.fieldType
+        })
+
+    console.warn(ids)
+    return ids.map((c)=> c.id)||[]
+  }
 }
