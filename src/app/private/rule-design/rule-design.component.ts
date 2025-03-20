@@ -28,7 +28,6 @@ export interface Rule {
   ruleName: string;
   salience: number;
   conditions: Condition[];
-  actions: Action[];
   workflow?: Workflow;
 }
 
@@ -152,7 +151,6 @@ export class RuleDesignComponent {
           idRule: this.rules.length + 1,
           ruleName: result.ruleName,
           conditions: [],
-          actions: [],
           salience: 100
         };
         this.rules = [...this.rules, newRule];
