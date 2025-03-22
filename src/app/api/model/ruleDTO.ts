@@ -9,9 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { ConditionDTO } from './conditionDTO';
+import { WorkflowDTO } from './workflowDTO';
 
-export interface PostedResourceDTO { 
-    msg?: string;
-    idPostedResource?: number;
-    success?: boolean;
+export interface RuleDTO { 
+    idRule?: number;
+    salience?: number;
+    ruleName?: string;
+    conditions?: Array<ConditionDTO>;
+    workflow?: WorkflowDTO;
 }

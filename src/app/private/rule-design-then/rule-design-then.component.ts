@@ -5,6 +5,7 @@ import {MatButton} from "@angular/material/button";
 import {Router} from "@angular/router";
 import {AppPaths} from "../../app.routes";
 import {Rule} from "../rule-design/rule-design.component";
+import {RuleDTO} from "../../api/model/ruleDTO";
 
 @Component({
   selector: 'app-rule-design-then',
@@ -19,7 +20,7 @@ import {Rule} from "../rule-design/rule-design.component";
 })
 export class RuleDesignThenComponent {
   @Input() idProject!: string;
-  @Input() rule!: Rule;
+  @Input() rule!: RuleDTO;
 
 
   constructor(private router: Router) {

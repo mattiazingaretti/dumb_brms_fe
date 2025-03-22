@@ -21,10 +21,15 @@ import {DynamicFormFieldComponent} from "../../shared/dynamic-form-field/dynamic
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {WarningDialogComponent} from "../../shared/dialogs/warning-dialog/warning-dialog.component";
 import {Workflow} from "../action-config/action-config.component";
+import {RuleDataCacheService} from "../../shared/services/rule-data-cache.service";
+import {DesignControllerService} from "../../api/api/designController.service";
+import {RuleDTO} from "../../api/model/ruleDTO";
+import {WorkflowDTO} from "../../api/model/workflowDTO";
+import {ConditionDTO} from "../../api/model/conditionDTO";
 
 
 export interface Rule {
-  idRule: number;
+  idRule?: number;
   ruleName: string;
   salience: number;
   conditions: Condition[];
@@ -73,13 +78,15 @@ export class RuleDesignComponent {
   @Input() idProject!: string ;
 
   @ViewChild(MatAccordion) accordion?: MatAccordion;
-  rules: Rule[] = [];
+  rules: RuleDTO[] = [];
   availableClasses: any[] = [];
   formGroup: FormGroup = new FormGroup({});
 
   constructor(
       public dialog: MatDialog,
-      public ruleDesignDataSharingService: RuleDesignDataSharingService
+      public ruleDesignDataSharingService: RuleDesignDataSharingService,
+      public designControllerService: DesignControllerService,
+      public ruleCacheService: RuleDataCacheService,
   ) {}
 
 
@@ -128,16 +135,17 @@ export class RuleDesignComponent {
   }
 
   private loadSavedRules() {
-    const savedRules = localStorage.getItem(LocalKeys.RULES);
-    if (!savedRules) {
-      console.warn("No saved rules found");
-      return;
-    }
-    this.rules = JSON.parse(savedRules);
-    this.rules.forEach((r)=>{
-      this.formGroup.addControl(r.idRule.toString(), new FormControl<number|null>(100, [Validators.required, Validators.pattern(/^[0-9]*$/)]));
-    })
+
+    this.ruleCacheService.getChachedRules(parseInt(this.idProject)).subscribe((rules: RuleDTO[]) => {
+      this.rules = rules;
+      this.rules.forEach((r, index)=>{
+        this.formGroup.addControl(index!.toString(), new FormControl<number|null>(100, [Validators.required, Validators.pattern(/^[0-9]*$/)]));
+      })
+    });
   }
+
+
+
 
   addRule() {
     const dialogRef = this.dialog.open(DesignDialogComponent, {
@@ -147,23 +155,33 @@ export class RuleDesignComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result?.isOk && !result?.isCanceled) {
-        const newRule: Rule = {
-          idRule: this.rules.length + 1,
+        const newRule: RuleDTO = {
           ruleName: result.ruleName,
           conditions: [],
           salience: 100
         };
         this.rules = [...this.rules, newRule];
-        this.saveRules();
+        // this.updateRules()
+        this.saveRules(newRule);
       }
     });
   }
 
-  private saveRules() {
-    localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
+
+  private saveRules(newRule: RuleDTO) {
+
+    this.designControllerService.addRuleInProj(newRule, parseInt(this.idProject)).subscribe((data)=>{
+      const rule = this.rules.find((r) => r.ruleName === newRule.ruleName && (r.idRule === null || r.idRule === undefined));
+      if (rule) {
+        rule.idRule = data.idRule;
+      }
+      this.rules = [...this.rules];
+      localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
+
+    });
   }
 
-  onRulesChange(conditions: Condition[], rule: Rule) {
+  onRulesChange(conditions: ConditionDTO[], rule: RuleDTO) {
     const changedRuleIdx = this.rules.findIndex((r)=> r.idRule === rule.idRule)
     if(changedRuleIdx === -1){
       console.error("Faield to find rule for which we need to save conditons  ");
@@ -171,7 +189,8 @@ export class RuleDesignComponent {
     }
     this.rules.at(changedRuleIdx)!.conditions = conditions
     this.rules = [...this.rules];
-    this.saveRules();
+    // this.saveRules();
+    this.updateRules();
   }
 
   ngOnDestroy() {
@@ -182,16 +201,17 @@ export class RuleDesignComponent {
     return this.formGroup.get(idRule.toString()) as FormControl;
   }
 
-  onSalienceChange(rule: Rule) {
-    const control = this.getFormControl(rule.idRule);
+  onSalienceChange(rule: RuleDTO) {
+    const control = this.getFormControl(rule.idRule!);
     if (control && control.valid ) {
       rule.salience = control.value;
       this.rules = [...this.rules];
-      this.saveRules();
+      // this.saveRules();
+      this.updateRules()
     }
   }
 
-  deleteRule(rule: Rule) {
+  deleteRule(rule: RuleDTO) {
     const dialogRef = this.dialog.open(WarningDialogComponent, {
       width: '350px',
       data: {
@@ -204,9 +224,16 @@ export class RuleDesignComponent {
 
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {
-        const filteredRules = this.rules.filter((r) => r.idRule !== rule.idRule);
-        this.rules = [...filteredRules]
-        this.saveRules();
+
+        // this.saveRules();
+
+        this.designControllerService.deleteRuleInProj([rule], parseInt(this.idProject)).subscribe((data)=>{
+            console.warn("Rule deleted successfully", data);
+            const filteredRules = this.rules.filter((r) => r.idRule !== rule.idRule);
+            this.rules = [...filteredRules]
+            localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
+
+        });
       }else {
         console.warn("Deletion cancelled");
       }
@@ -220,5 +247,12 @@ export class RuleDesignComponent {
 
   getRuleConditions(rule: Rule) {
     return this.rules.find((r:any) => r.idRule === rule.idRule)?.conditions || [];
+  }
+
+  private updateRules() {
+      this.designControllerService.patchRulesInProject(this.rules, parseInt(this.idProject)).subscribe((data)=>{
+        this.rules = data
+        localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(data));
+      });
   }
 }

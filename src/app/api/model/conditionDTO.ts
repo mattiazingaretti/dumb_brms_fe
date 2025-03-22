@@ -10,8 +10,12 @@
  * Do not edit the class manually.
  */
 
-export interface PostedResourceDTO { 
-    msg?: string;
-    idPostedResource?: number;
-    success?: boolean;
+export interface ConditionDTO { 
+    idCondition?: number;
+    className?: string;
+    field?: string;
+    operator?: string;
+    conditionNameId?: string;
+    value?: any;
+    flgUseIdCondition?: boolean;
 }

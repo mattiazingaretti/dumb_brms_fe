@@ -1,8 +1,11 @@
 import {Injectable} from '@angular/core';
 import {DesignControllerService} from "../../api/api/designController.service";
-import {Observable, of, tap} from "rxjs";
+import {map, Observable, of, tap} from "rxjs";
 import {RuleDataResponseDTO} from "../../api/model/ruleDataResponseDTO";
-import {Rule} from "../../private/rule-design/rule-design.component";
+import {Condition, Rule} from "../../private/rule-design/rule-design.component";
+import {RuleDTO} from "../../api/model/ruleDTO";
+import {ConditionDTO} from "../../api/model/conditionDTO";
+import {WorkflowDTO} from "../../api/model/workflowDTO";
 
 export  const RULE_CACHE_KEY ={
     RULE_DATA: 'ruleData_',
@@ -34,6 +37,22 @@ export class RuleDataCacheService {
       );
     }
   }
+
+  getChachedRules(idProject: number, force: boolean = false): Observable<RuleDTO[]> {
+      const cacheKey = `${RULE_CACHE_KEY.RULES}${idProject}`;
+      const cachedRules = localStorage.getItem(cacheKey);
+      if (cachedRules && !force) {
+          let rules: RuleDTO[] | null = JSON.parse(cachedRules);
+          if (rules === null) {
+              return this.getChachedRules(idProject, true);
+          }
+          return of(rules);
+      } else{
+          return this.designControllerService.getAllRulesInProject(idProject)
+      }
+  }
+
+
 
   getCachedRuleConditions(idProject: number, idRule: number, force: boolean = false) : Observable<Rule>{
       const cacheKey = `${RULE_CACHE_KEY.RULES}${idProject}`;

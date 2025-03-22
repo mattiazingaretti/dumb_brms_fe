@@ -32,6 +32,7 @@ import {BlocksSharingService} from "../canvas/services/blocks-sharing.service";
 
 export interface Workflow {
   name: string;
+  lastModified: Date;
 }
 
 export enum BlockType {

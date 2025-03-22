@@ -17,6 +17,7 @@ import { HttpClient, HttpHeaders, HttpParams,
 import { Observable }                                        from 'rxjs';
 
 import { PostedResourceDTO } from '../model/postedResourceDTO';
+import { RuleDTO } from '../model/ruleDTO';
 import { RuleDataResponseDTO } from '../model/ruleDataResponseDTO';
 import { RuleDataTypesDTO } from '../model/ruleDataTypesDTO';
 import { RuleInputRequestDTO } from '../model/ruleInputRequestDTO';
@@ -59,6 +60,58 @@ export class DesignControllerService {
         return false;
     }
 
+
+    /**
+     * 
+     * 
+     * @param body 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public addRuleInProj(body: RuleDTO, projectId: number, observe?: 'body', reportProgress?: boolean): Observable<RuleDTO>;
+    public addRuleInProj(body: RuleDTO, projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<RuleDTO>>;
+    public addRuleInProj(body: RuleDTO, projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<RuleDTO>>;
+    public addRuleInProj(body: RuleDTO, projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling addRuleInProj.');
+        }
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling addRuleInProj.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.request<RuleDTO>('post',`${this.basePath}/design/addRuleInProj/${encodeURIComponent(String(projectId))}`,
+            {
+                body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
 
     /**
      * 
@@ -146,6 +199,98 @@ export class DesignControllerService {
         return this.httpClient.request<PostedResourceDTO>('post',`${this.basePath}/design/addRuleOutputData`,
             {
                 body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param body 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public deleteRuleInProj(body: Array<RuleDTO>, projectId: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteRuleInProj(body: Array<RuleDTO>, projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteRuleInProj(body: Array<RuleDTO>, projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteRuleInProj(body: Array<RuleDTO>, projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling deleteRuleInProj.');
+        }
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling deleteRuleInProj.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.request<any>('delete',`${this.basePath}/design/deleteRuleInProj/${encodeURIComponent(String(projectId))}`,
+            {
+                body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getAllRulesInProject(projectId: number, observe?: 'body', reportProgress?: boolean): Observable<Array<RuleDTO>>;
+    public getAllRulesInProject(projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<RuleDTO>>>;
+    public getAllRulesInProject(projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<RuleDTO>>>;
+    public getAllRulesInProject(projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling getAllRulesInProject.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<Array<RuleDTO>>('get',`${this.basePath}/design/getAllRulesInProject/${encodeURIComponent(String(projectId))}`,
+            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -305,6 +450,58 @@ export class DesignControllerService {
 
         return this.httpClient.request<Array<RuleOutputResponseDTO>>('get',`${this.basePath}/design/getRuleOutputData/${encodeURIComponent(String(projectId))}`,
             {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param body 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public patchRulesInProject(body: Array<RuleDTO>, projectId: number, observe?: 'body', reportProgress?: boolean): Observable<Array<RuleDTO>>;
+    public patchRulesInProject(body: Array<RuleDTO>, projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<RuleDTO>>>;
+    public patchRulesInProject(body: Array<RuleDTO>, projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<RuleDTO>>>;
+    public patchRulesInProject(body: Array<RuleDTO>, projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling patchRulesInProject.');
+        }
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling patchRulesInProject.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.request<Array<RuleDTO>>('patch',`${this.basePath}/design/patchRulesInProject/${encodeURIComponent(String(projectId))}`,
+            {
+                body: body,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

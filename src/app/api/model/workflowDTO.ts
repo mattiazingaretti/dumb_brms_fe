@@ -10,8 +10,8 @@
  * Do not edit the class manually.
  */
 
-export interface PostedResourceDTO { 
-    msg?: string;
-    idPostedResource?: number;
-    success?: boolean;
+export interface WorkflowDTO { 
+    idWorkflow?: number;
+    lastModified?: Date;
+    name?: string;
 }

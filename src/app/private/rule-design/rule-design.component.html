@@ -8,22 +8,22 @@
     </div>
 
     <mat-accordion class="example-headers-align" multi>
-        <mat-expansion-panel *ngFor="let rule of rules">
+        <mat-expansion-panel *ngFor="let rule of rules; let i = index">
             <mat-expansion-panel-header>
                 <mat-panel-title><button mat-icon-button (click)="deleteRule(rule); $event.stopPropagation()"><mat-icon>delete</mat-icon></button> ID: {{ rule.idRule }}</mat-panel-title>
                 <mat-panel-description class="header_style">
                     {{ rule.ruleName }}
-                    <mat-slide-toggle (click)="$event.stopPropagation();" (change)="toggleRuleActivation(rule.idRule, $event);"></mat-slide-toggle>
+                    <mat-slide-toggle (click)="$event.stopPropagation();" (change)="toggleRuleActivation(rule.idRule!, $event);"></mat-slide-toggle>
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
             <mat-label>Salience</mat-label>
-            <app-dynamic-form-field [label]="'Salience'" [fControl]="getFormControl(rule.idRule)" (changed)="onSalienceChange(rule)"></app-dynamic-form-field>
+            <app-dynamic-form-field [label]="'Salience'" [fControl]="getFormControl(i)" (changed)="onSalienceChange(rule)"></app-dynamic-form-field>
 
             <!-- WHEN Section -->
             <app-rule-design-when
                     [availableClasses]="availableClasses"
-                    [idRule]="rule.idRule"
+                    [idRule]="rule.idRule!"
                     (saveConditions)="onRulesChange($event, rule)">
             </app-rule-design-when>
 

@@ -11,6 +11,7 @@ import {MatSelect} from "@angular/material/select";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {Rule} from "../rule-design/rule-design.component";
 import {LocalKeys} from "../../app.routes";
+import {RuleDTO} from "../../api/model/ruleDTO";
 
 @Component({
   selector: 'app-rule-design-when',
@@ -40,7 +41,7 @@ export class RuleDesignWhenComponent {
     @Output() saveConditions = new EventEmitter<any[]>();
     operators = ['equals', 'not equals', 'greater than', 'less than'];
     conditionsForm!: FormGroup;
-    rules: Rule[] = []
+    rules: RuleDTO[] = []
 
     constructor(private fb: FormBuilder) {}
 
@@ -60,8 +61,8 @@ export class RuleDesignWhenComponent {
         return this.conditionsForm.get('conditions') as FormArray;
     }
 
-    patchConditions(rules: Rule[]) {
-        rules.find((r)=>r.idRule === this.idRule)?.conditions.forEach((condition)=> this.addCondition(condition))
+    patchConditions(rules: RuleDTO[]) {
+        rules.find((r)=>r.idRule === this.idRule)!.conditions!.forEach((condition)=> this.addCondition(condition))
     }
 
     addCondition(initialValue: any = null): void {

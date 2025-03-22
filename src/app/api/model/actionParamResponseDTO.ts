@@ -16,9 +16,9 @@ export interface ActionParamResponseDTO {
     paramDirection?: ActionParamResponseDTO.ParamDirectionEnum;
 }
 export namespace ActionParamResponseDTO {
-    export type ParamDirectionEnum = 'INPUT' | 'OUTPUT';
+    export type ParamDirectionEnum = 'ActionParamDirection.INPUT' | 'ActionParamDirection.OUTPUT';
     export const ParamDirectionEnum = {
-        INPUT: 'INPUT' as ParamDirectionEnum,
-        OUTPUT: 'OUTPUT' as ParamDirectionEnum
+        INPUT: 'ActionParamDirection.INPUT' as ParamDirectionEnum,
+        OUTPUT: 'ActionParamDirection.OUTPUT' as ParamDirectionEnum
     };
 }
