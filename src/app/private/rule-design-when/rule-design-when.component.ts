@@ -12,6 +12,8 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {Rule} from "../rule-design/rule-design.component";
 import {LocalKeys} from "../../app.routes";
 import {RuleDTO} from "../../api/model/ruleDTO";
+import {ConditionDTO} from "../../api/model/conditionDTO";
+import {RuleDesignDataSharingService} from "../../shared/services/rule-design-data-sharing.service";
 
 @Component({
   selector: 'app-rule-design-when',
@@ -38,21 +40,41 @@ import {RuleDTO} from "../../api/model/ruleDTO";
 export class RuleDesignWhenComponent {
     @Input() availableClasses: any[] = [];
     @Input() idRule!: number;
+    @Input() idProject!: string;
     @Output() saveConditions = new EventEmitter<any[]>();
     operators = ['equals', 'not equals', 'greater than', 'less than'];
     conditionsForm!: FormGroup;
     rules: RuleDTO[] = []
 
-    constructor(private fb: FormBuilder) {}
+    constructor(
+        private fb: FormBuilder,
+        private  ruleDesignDataSharingService :RuleDesignDataSharingService
+    ) {}
 
     ngOnInit(): void {
         this.conditionsForm = this.fb.group({
             conditions: this.fb.array([]),
         });
-        this.rules = localStorage.getItem(LocalKeys.RULES) ? JSON.parse(localStorage.getItem(LocalKeys.RULES)!) : []
+        this.ruleDesignDataSharingService.isConditionsChanged().subscribe((isChanged)=>{
+            if(isChanged) {
+                this.resetConditions();
+                this.initConditions();
+            }
+        });
+        this.resetConditions()
+        this.initConditions()
+    }
 
+    resetConditions(){
+        this.conditionsArray.clear();
+    }
+
+    initConditions(): void {
+        this.rules = localStorage.getItem(`${LocalKeys.RULES}_${this.idProject}`) ? JSON.parse(localStorage.getItem(`${LocalKeys.RULES}_${this.idProject}`)!) : []
+
+        const currentRule = this.rules.find((r)=>r.idRule === this.idRule)
         // Initialize the form with existing conditions if provided
-        if (this.rules && this.rules.length > 0) {
+        if (currentRule?.conditions && currentRule.conditions.length > 0) {
             this.patchConditions(this.rules);
         }
     }
@@ -68,12 +90,12 @@ export class RuleDesignWhenComponent {
     addCondition(initialValue: any = null): void {
         const conditionGroup = this.fb.group(
             {
-                idCondition: [
-                    initialValue?.idCondition || '',
+                conditionNameId: [
+                    initialValue?.conditionNameId || '',
                     [Validators.required, this.uniqueIdConditionValidator()],
                 ],
                 useIdCondition: [initialValue?.useIdCondition || false],
-                class: [initialValue?.class || null, Validators.required],
+                className: [initialValue?.className || null, Validators.required],
                 field: [initialValue?.field || null, [Validators.required, this.matchClassDataTypeValidator()]],
                 operator: [initialValue?.operator || null,Validators.required],
                 value: [initialValue?.value || null, [this.requiredByUseIdCondTrue()]],
@@ -99,17 +121,17 @@ export class RuleDesignWhenComponent {
     getOtherConditions(i: number): any[] {
         return this.conditionsArray.controls
             .filter((control, index) => index !== i)
-            .map(control => control.value.idCondition)
+            .map(control => control.value.conditionNameId)
             .filter(idCondition => !!idCondition); // Filter out empty IDs
     }
 
     getIdConditionFields(referencedIdCondition: string): any[] {
         const condition = this.conditionsArray.controls.find(
-            control => control.value.idCondition === referencedIdCondition
+            control => control.value.conditionNameId === referencedIdCondition
         )?.value;
 
-        if (condition && condition.class) {
-            return this.getClassFields(condition.class);
+        if (condition && condition.className) {
+            return this.getClassFields(condition.className);
         }
 
         return [];
@@ -119,7 +141,7 @@ export class RuleDesignWhenComponent {
         return (control: any) => {
             const idCondition = control.value;
             const index = this.conditionsArray.controls.findIndex(
-                (formGroup: any) => formGroup.value.idCondition === idCondition
+                (formGroup: any) => formGroup.value.conditionNameId === idCondition
             );
 
             if (index !== -1 && index !== this.conditionsArray.controls.indexOf(control.parent)) {
@@ -135,7 +157,7 @@ export class RuleDesignWhenComponent {
             const fieldControl = formGroup.get('field');
             const selectedIdConditionFieldControl = formGroup.get('selectedIdConditionField');
             const selectedIdConditionControl = formGroup.get('referencedIdCondition');
-            const classControl = formGroup.get('class');
+            const classControl = formGroup.get('className');
             const useIdConditionControl = formGroup.get('useIdCondition');
 
             if (
@@ -145,8 +167,8 @@ export class RuleDesignWhenComponent {
                 classControl?.value && selectedIdConditionControl?.value
             ) {
                 const fieldType = this.getFieldDataType(fieldControl.value, classControl?.value);
-                const conditionOfSelectedType = ((this.conditionsForm.controls['conditions'] as any).controls as FormGroup[]).find((f: any)=> f.controls['idCondition'].value === selectedIdConditionControl.value)
-                const classOfSelectedType = conditionOfSelectedType?.controls['class'].value;
+                const conditionOfSelectedType = ((this.conditionsForm.controls['conditions'] as any).controls as FormGroup[]).find((f: any)=> f.controls['conditionNameId'].value === selectedIdConditionControl.value)
+                const classOfSelectedType = conditionOfSelectedType?.controls['className'].value;
                 const selectedFieldType = this.getFieldDataType(selectedIdConditionFieldControl.value, classOfSelectedType);
 
                 if (fieldType !== selectedFieldType) {
@@ -173,8 +195,8 @@ export class RuleDesignWhenComponent {
             control => control.value.idCondition === referencedIdCondition
         )?.value;
 
-        if (condition && condition.class) {
-            const field = this.getClassFields(condition.class).find(f => f.identifier === fieldIdentifier);
+        if (condition && condition.className) {
+            const field = this.getClassFields(condition.className).find(f => f.identifier === fieldIdentifier);
             return field?.type || null;
         }
 

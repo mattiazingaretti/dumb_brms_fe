@@ -7,7 +7,7 @@ import {BehaviorSubject} from "rxjs";
 export class RuleDesignDataSharingService {
 
   refreshData: BehaviorSubject<boolean> = new BehaviorSubject(false);
-
+  conditionsChanged: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor() { }
 
@@ -21,6 +21,14 @@ export class RuleDesignDataSharingService {
 
   completeRefreshData() {
     this.refreshData.complete();
+  }
+
+  setConditionsChanged(flag : boolean) {
+      this.conditionsChanged.next(flag);
+  }
+
+  isConditionsChanged() {
+      return this.conditionsChanged.asObservable();
   }
 
 }

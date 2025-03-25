@@ -5,8 +5,8 @@
             <!-- ID CONDITION Input -->
             <mat-form-field>
                 <mat-label>ID CONDITION</mat-label>
-                <input matInput formControlName="idCondition" placeholder="Enter ID" />
-                <mat-error *ngIf="condition.get('idCondition')?.invalid && condition.get('idCondition')?.touched">
+                <input matInput formControlName="conditionNameId" placeholder="Enter ID" />
+                <mat-error *ngIf="condition.get('conditionNameId')?.invalid && condition.get('conditionNameId')?.touched">
                     ID CONDITION must be unique.
                 </mat-error>
             </mat-form-field>
@@ -19,7 +19,7 @@
             <!-- Class Dropdown -->
             <mat-form-field>
                 <mat-label>Class</mat-label>
-                <mat-select formControlName="class">
+                <mat-select formControlName="className">
                     <mat-option *ngFor="let cls of availableClasses" [value]="cls.title">
                         {{ cls.title }}
                     </mat-option>
@@ -27,10 +27,10 @@
             </mat-form-field>
 
             <!-- Field Dropdown -->
-            <mat-form-field *ngIf="condition.get('class')?.value">
+            <mat-form-field *ngIf="condition.get('className')?.value">
                 <mat-label>Field</mat-label>
                 <mat-select formControlName="field">
-                    <mat-option *ngFor="let field of getClassFields(condition.get('class')?.value)" [value]="field.identifier">
+                    <mat-option *ngFor="let field of getClassFields(condition.get('className')?.value)" [value]="field.identifier">
                         {{ field.identifier }}
                     </mat-option>
                 </mat-select>

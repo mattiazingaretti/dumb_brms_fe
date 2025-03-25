@@ -40,7 +40,8 @@ export interface Condition {
   class?: string;
   field?: string;
   operator?: string;
-  idCondition?: string;
+  idCondition?: number;
+  conditionNameId: string;
   value?: any;
   useIdCondition?: boolean;
 }
@@ -86,7 +87,7 @@ export class RuleDesignComponent {
       public dialog: MatDialog,
       public ruleDesignDataSharingService: RuleDesignDataSharingService,
       public designControllerService: DesignControllerService,
-      public ruleCacheService: RuleDataCacheService,
+      public ruleCacheService: RuleDataCacheService
   ) {}
 
 
@@ -137,10 +138,14 @@ export class RuleDesignComponent {
   private loadSavedRules() {
 
     this.ruleCacheService.getChachedRules(parseInt(this.idProject)).subscribe((rules: RuleDTO[]) => {
+
       this.rules = rules;
+      localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
+
       this.rules.forEach((r, index)=>{
         this.formGroup.addControl(index!.toString(), new FormControl<number|null>(100, [Validators.required, Validators.pattern(/^[0-9]*$/)]));
       })
+      this.ruleDesignDataSharingService.setConditionsChanged(true);
     });
   }
 
@@ -232,7 +237,6 @@ export class RuleDesignComponent {
             const filteredRules = this.rules.filter((r) => r.idRule !== rule.idRule);
             this.rules = [...filteredRules]
             localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
-
         });
       }else {
         console.warn("Deletion cancelled");
@@ -245,14 +249,12 @@ export class RuleDesignComponent {
     console.warn("Toggle rule activation", idRule, $event.checked);
   }
 
-  getRuleConditions(rule: Rule) {
-    return this.rules.find((r:any) => r.idRule === rule.idRule)?.conditions || [];
-  }
 
   private updateRules() {
       this.designControllerService.patchRulesInProject(this.rules, parseInt(this.idProject)).subscribe((data)=>{
         this.rules = data
         localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(data));
+        this.ruleDesignDataSharingService.setConditionsChanged(true);
       });
   }
 }
