@@ -1,0 +1,63 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav mode="side" #sidenav opened="false"  >
+        <div class="form-container">
+            <app-dynamic-form-field [fControl]="getFormControl('workflowName')"  ></app-dynamic-form-field>
+        </div>
+        <mat-accordion>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Data</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="panel-content" >
+                    <mat-form-field appearance="fill"  >
+                        <mat-label>Choose data</mat-label>
+                        <mat-select [formGroup]="fGroup" [formControl]="getFormControl('dataBlock')"   >
+                            <mat-option *ngFor="let condition of dataDropDownOptions" [value]="condition.class" >
+                                {{condition.idCondition}} : {{condition.class}}
+                                <mat-chip-row *ngIf="isInputCondition(condition.class)" color="primary">Input</mat-chip-row>
+                                <mat-chip-row *ngIf="!isInputCondition(condition.class)" color="accent">Output</mat-chip-row>
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" (click)="addBlock()">Add block</button>
+                </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Actions</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="panel-content" >
+                    <mat-form-field appearance="fill"  >
+                        <mat-label>Choose data</mat-label>
+                        <mat-select [formGroup]="fGroup" [formControl]="getFormControl('actionBlock')"   >
+                            <mat-option *ngFor="let action of actionsDropDownOptions" [value]="action.actionName" >
+                                {{action.actionName }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" (click)="addBlock(true)">Add block</button>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <button mat-icon-button color="primary" class="menu-button" (click)="toggleSidenav()">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <div class="flow-wrapper">
+            <app-action-canvas ></app-action-canvas>
+            <div class="cta-buttons">
+                <div class="top-row">
+                    <button mat-raised-button color="primary" (click)="backToRuleSettings()">
+                        Back
+                    </button>
+                    <button mat-raised-button color="accent" (click)="save()">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+        <app-footer></app-footer>
+    </mat-sidenav-content>
+</mat-sidenav-container>

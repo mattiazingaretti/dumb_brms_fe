@@ -1,21 +1,18 @@
 
 :root {
-    --bg-color:#020303;
-    --text-color:#edf7f6;
+    --bg-color:#edf7f6;
+    --text-color:#020303;
     --primary-color:#4bafa3;
     --secondary-color:#2d2960;
     --accent-color:#5a3a88;
-    
 }
 
 html, body{
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    margin: 0;
+    height: 100%;
     font-family: 'QuickSand';
 }
-i {
-    color: var(--text-color);
-}
+
 
 .flx_row{
     display: flex;
@@ -25,5 +22,18 @@ i {
     display: flex;
     flex-direction: column;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.flex_row_center{
+    display: flex;
+    align-items: center;
+}
+
+.home-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+/* Main Content */
+.main-content {
+    flex: 1; /* Allow the main content to grow and take up available space */
+}

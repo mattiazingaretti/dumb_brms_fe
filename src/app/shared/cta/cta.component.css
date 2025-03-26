@@ -4,7 +4,7 @@
     padding: 10px;
     cursor: pointer;
     gap: 10px;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .cta-outline{

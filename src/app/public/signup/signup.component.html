@@ -1,0 +1,35 @@
+<div class="flx_row ">
+    <div class="flx_column">
+        <h2>Sign Up </h2>
+
+        <mat-form-field>
+            <mat-label>Enter your Full Name</mat-label>
+            <input matInput [formControl]="username" (blur)="updateErrorMessage(this.email)" required autocomplete="one-time-code"/>
+            @if (username.invalid) {
+                <mat-error>{{errorMessage()}}</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Enter your email</mat-label>
+            <input matInput [formControl]="email" (blur)="updateErrorMessage(this.email)" required autocomplete="one-time-code"/>
+            @if (email.invalid) {
+                <mat-error>{{errorMessage()}}</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Enter your password</mat-label>
+            <input matInput [formControl]="password" [type]="hide() ? 'password' : 'text'" autocomplete="one-time-code"/>
+            <button
+                    mat-icon-button
+                    matSuffix
+                    (click)="clickEvent($event)"
+                    [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="hide()"
+            >
+                <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+        </mat-form-field>
+        <app-cta [msg]="'SignUp'" [isOutline]="true" (clicked)="performSignup()"></app-cta>
+        <app-cta [msg]="'Already Signed in? Click here!'" (clicked)="router.navigate([appPaths.LOGIN]);"></app-cta>
+    </div>
+</div>

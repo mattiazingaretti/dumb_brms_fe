@@ -1,0 +1,21 @@
+
+<form (ngSubmit)="onSubmit()">
+    @if (isEdit) {
+
+        <mat-form-field  (focusout)="onFocusOut()" >
+            @if (label){
+                <mat-label>{{ label }}</mat-label>
+            } @else {
+                <mat-label>First name</mat-label>
+            }
+            <input matInput [formControl]="fControl!" #myInput (change)="onChange($event)">
+            <!-- Error handling template for form control -->
+            <ng-content></ng-content>
+        </mat-form-field>
+    
+    } @else {
+        <mat-label (click)="onClick()">{{fControl?.value}}</mat-label>
+    } 
+</form>
+
+

@@ -1,0 +1,38 @@
+.mat-stepper-vertical {
+    margin-top: 8px;
+  }
+  
+  .mat-mdc-form-field {
+    margin-top: 16px;
+  }
+
+.condition-container, .action-container {
+    padding: 1rem;
+}
+
+.condition-row, .action-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+mat-form-field {
+    flex: 1;
+    min-width: 150px;
+}
+
+.condition-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Space between sections */
+}
+
+.add-condition-section {
+    text-align: left; /* Align the Add Condition button with the list */
+}
+
+.save-section {
+    margin-top: 24px; /* Add space above the Save button */
+    text-align: right; /* Align the Save button to the right */
+}

@@ -1,0 +1,101 @@
+<div class="cardControls">
+    <button mat-flat-button color="warn" [class]="'smallMargin'"  (click)="onClickAddCard()">Add Card</button>
+    <button *ngIf="needToBeSaved.asObservable() | async" mat-flat-button color="warn"  [class]="'smallMargin'" (click)="onSave(true)">Save </button>
+</div>
+<div class="cardContainer">
+
+    <!-- TODO add a validator across all cards data type and verify that the data type name is unique across all the classes in the project -->
+    @for (card of cards; track card.id) {
+        <div class="card">
+            <mat-card class="example-card" appearance="outlined">
+                <form>
+                    <mat-card-header>
+                        <mat-card-title>
+                            <div class="flex_row_center">
+                              <app-dynamic-form-field [fControl]="getFormControl(card, 'title')"  >
+                              <ng-container>
+                                  @if (getFormControl(card, 'title').hasError('required')) {
+                                    <mat-error style="font-size: small">Title is <strong>required</strong></mat-error>
+                                  }
+                                </ng-container>
+                              </app-dynamic-form-field>
+                              <button mat-icon-button (click)="onDeleteCard(card)"><mat-icon>delete</mat-icon></button>
+                            </div>
+
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            <app-dynamic-form-field [fControl]="getFormControl(card, 'descr')">
+                            </app-dynamic-form-field>
+                        </mat-card-subtitle>
+                    </mat-card-header>
+
+                    <table mat-table [dataSource]="card.dataSource" class="ruleInputTable mat-elevation-z8">
+                        
+                          <ng-container matColumnDef="toDelete">
+                            <th mat-header-cell *matHeaderCellDef>Delete</th>
+                            <td mat-cell *matCellDef="let element"><button mat-icon-button (click)="onDeleteCardField(card,element)"><mat-icon>delete</mat-icon></button></td>
+                          </ng-container>  
+                        
+                        <ng-container matColumnDef="dataType">
+                            <th mat-header-cell *matHeaderCellDef>Data Type</th>
+                            <td mat-cell *matCellDef="let element">{{ element.dataType }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="identifier">
+                            <th mat-header-cell *matHeaderCellDef>Identifier</th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element.dataIdentifier }}
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="getDisplayedColumns(card)"></tr>
+                        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns(card)"></tr>
+                    </table>
+
+                    @if (!card.readOnly) {
+                    <div class="dataInputClassContainer">
+                        <mat-form-field class="dataInputClass">
+                            <mat-label>Data Type</mat-label>
+                            <input #input type="text" placeholder="Pick one" matInput
+                                [formControl]="getFormControl(card, 'dataType')" [matAutocomplete]="auto" (input)="filter(card, $index)"
+                                (focus)="filter(card,$index)" />
+                            <mat-autocomplete requireSelection #auto="matAutocomplete">
+                                @for (option of card.filteredOptions; track option) {
+                                <mat-option [value]="option">{{ option }}</mat-option>
+                                }
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <mat-form-field class="dataInputClass">
+                            <mat-label>Data Identifier</mat-label>
+                            <input matInput [formControl]="getFormControl(card, 'dataIdentifier')" />
+                            @if (getFormControl(card, 'dataIdentifier').hasError('required')) {
+                            <mat-error style="font-size: small">Data Identifier is <strong>required</strong></mat-error>
+                            } @else if(getFormControl(card, 'dataIdentifier').hasError('invalidDataIdentifier')){
+                              <mat-error style="font-size: smaller">Required max length of 20 no spaces and only numbers or letterschars</mat-error>
+                            }
+                        </mat-form-field>
+                    </div>
+                    @if (card.fGroup.hasError('hasDuplicate')) {
+                      <mat-error>Duplicate record. It already exist in table.</mat-error>
+                    }@else if(getFormControl(card, 'title').hasError('invalidDataIdentifier')) {
+                    <mat-error style="font-size: small">For the title it is required max length of 20 no spaces and only
+                        numbers or letters chars</mat-error>
+                    } @else if(getFormControl(card, 'title').hasError('duplicateDataType')) {
+                      <mat-error style="font-size: smaller">Please change card data type name. It already exists one. </mat-error>
+                    }
+                  }
+                </form>
+                <mat-card-actions class="ruleInputActions ">
+                    @if (!card.readOnly) {
+                      <div class="ruleInputActions">
+                        <app-cta [msg]="'Cancel'" [isOutline]="true" (clicked)="card.readOnly = true" ></app-cta>
+                        <app-cta [msg]="'Add'" [isOutline]="true" (clicked)="onClickedAddField(card)" [isDisabled]="getCardFormGroup(card).invalid"></app-cta>
+                      </div>
+                      <app-cta [msg]="'Save'" [isOutline]="true" (clicked)="onClickedSave(card)" [isDisabled]="getCardFormGroup(card).invalid"></app-cta>
+                    }@else{
+                    <app-cta [msg]="'Edit'" [isOutline]="true" (clicked)="card.readOnly = false"></app-cta>
+                    }
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    }
+</div>

@@ -1,0 +1,29 @@
+.demo-table {
+    width: 100%;
+  }
+  
+  .mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+  }
+  
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+  }
+  
+  .demo-row-is-clicked {
+    font-weight: bold;
+  }
+.dashBoardParentContainer{
+  margin-top: 10%;
+  display: flex;
+  justify-content: center;
+}
+.dashBoardContainer{
+  display: flex;
+  flex-direction: column;
+    align-items: flex-end;
+  gap: 1rem;
+  width: 80%;
+}

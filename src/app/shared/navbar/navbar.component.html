@@ -1,21 +1,48 @@
-<nav class="navbar flx_row">
-    <div class="navbar-logo flx_row">
-        <img src="assets/logo.png" alt="My App Logo" />
+<nav class="navbar" mat-toolbar color="primary">
+    <!-- Logo Section -->
+    <div class="navbar-logo" (click)="router.navigate([appPaths.ROOT])">
+        <img src="../../../assets/logo.svg" alt="My App Logo" />
     </div>
-    <ul class="navbar-links flx_row">
-        <li style="list-style-type: none">
-            <app-cta 
-                [msg]="'Features'"
-            ></app-cta>
+
+    <ul class="navbar-links" *ngIf="!isLoggedIn">
+        <li>
+            <button mat-button (click)="router.navigate([appPaths.FEATURES])">Features</button>
         </li>
-        <li style="list-style-type: none">
-            <app-cta [msg]="'Docs'"></app-cta>
+        <li>
+            <button mat-button (click)="router.navigate([appPaths.DOCS])">Docs</button>
         </li>
-        <li style="list-style-type: none">
-            <app-cta [msg]="'About us'"></app-cta>
+        <li>
+            <button mat-button (click)="router.navigate([appPaths.ABOUT])">About us</button>
         </li>
     </ul>
-    <div class="navbar-actions flx_row">
-        <app-cta [msg]="'Join us'" [isOutline]="true" [iconName]="'fa-user-friends'"></app-cta>
+
+    <div class="navbar-actions">
+        <button
+                mat-raised-button
+                color="accent"
+                *ngIf="!isLoggedIn"
+                (click)="router.navigate([appPaths.LOGIN])"
+                class="login-button"
+        >
+            Join us
+        </button>
+
+        <!-- Logged-In User Menu -->
+        <mat-menu #userMenu="matMenu">
+            <button mat-menu-item (click)="navigateToDashBoard()">Dashboard</button>
+            <button mat-menu-item (click)="navigateToSettings()">Settings</button>
+            <button mat-menu-item (click)="logout()">Logout</button>
+        </mat-menu>
+
+        <button
+                mat-icon-button
+                *ngIf="isLoggedIn"
+                [matMenuTriggerFor]="userMenu"
+                aria-label="Open user menu"
+                class="user-menu-button"
+        >
+            <span>{{ username }}</span>
+            <mat-icon>account_circle</mat-icon>
+        </button>
     </div>
 </nav>

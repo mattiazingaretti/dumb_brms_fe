@@ -1,0 +1,8 @@
+mat-dialog-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+mat-dialog-content p {
+    margin: 10px 0;
+}

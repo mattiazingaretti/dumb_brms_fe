@@ -1,21 +1,70 @@
-.navbar-logo{
-    width: 20%;
+/* Navbar Container */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Distribute space between logo, links, and actions */
+    align-items: center; /* Vertically align items */
+    padding: 0 16px;
+    background-color: #1976d2; /* Angular Material primary color */
+    color: white;
+}
+
+/* Logo Section */
+.navbar-logo {
+    cursor: pointer;
+    display: flex;
     align-items: center;
 }
 
-.navbar{
-    justify-content: space-between;
-    
+.navbar-logo img {
+    height: 40px;
 }
 
-.navbar-links{
-    width: 40%;
-    justify-content: space-evenly;
+/* Links Section */
+.navbar-links {
+    display: flex;
+    gap: 16px; /* Space between links */
 }
 
-.navbar-actions{
-    justify-content: center;
+.navbar-links li {
+    list-style-type: none; /* Remove bullet points */
+}
+
+.navbar-links button {
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* Actions Section */
+.navbar-actions {
+    display: flex;
     align-items: center;
-    width: 20%;
 }
 
+/* Login Button for Non-Logged-In Users */
+.login-button {
+    margin-left: auto; /* Push the button to the end of the flex container */
+}
+
+/* User Menu Button for Logged-In Users */
+.user-menu-button {
+    display: flex;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-links {
+        display: none; /* Hide links on smaller screens */
+    }
+
+    .navbar-logo {
+        width: auto;
+    }
+
+    .navbar-actions {
+        width: auto;
+    }
+}

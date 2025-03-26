@@ -1,0 +1,36 @@
+<div>
+    <div class="example-action-buttons">
+        <div style="display: flex;">
+            <button  mat-mini-fab color="warn"  (click)="accordion!.openAll()"><mat-icon>expand</mat-icon></button>
+            <button  mat-mini-fab color="warn" (click)="accordion!.closeAll()"><mat-icon>close_fullscreen</mat-icon></button>
+        </div>
+        <button  mat-mini-fab color="warn" (click)="addRule()"><mat-icon>add</mat-icon></button>
+    </div>
+
+    <mat-accordion class="example-headers-align" multi>
+        <mat-expansion-panel *ngFor="let rule of rules; let i = index">
+            <mat-expansion-panel-header>
+                <mat-panel-title><button mat-icon-button (click)="deleteRule(rule); $event.stopPropagation()"><mat-icon>delete</mat-icon></button> ID: {{ rule.idRule }}</mat-panel-title>
+                <mat-panel-description class="header_style">
+                    {{ rule.ruleName }}
+                    <mat-slide-toggle (click)="$event.stopPropagation();" (change)="toggleRuleActivation(rule.idRule!, $event);"></mat-slide-toggle>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <mat-label>Salience</mat-label>
+            <app-dynamic-form-field [label]="'Salience'" [fControl]="getFormControl(i)" (changed)="onSalienceChange(rule)"></app-dynamic-form-field>
+
+            <!-- WHEN Section -->
+            <app-rule-design-when
+                    [availableClasses]="availableClasses"
+                    [idRule]="rule.idRule!"
+                    [idProject]="this.idProject!"
+                    (saveConditions)="onRulesChange($event, rule)">
+            </app-rule-design-when>
+
+            <!-- THEN Section -->
+            <app-rule-design-then [rule]="rule" [idProject]="idProject">
+            </app-rule-design-then>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>
