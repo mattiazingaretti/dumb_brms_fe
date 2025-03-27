@@ -143,7 +143,7 @@ export class RuleDesignComponent {
       localStorage.setItem(`${LocalKeys.RULES}_${this.idProject}`, JSON.stringify(this.rules));
 
       this.rules.forEach((r, index)=>{
-        this.formGroup.addControl(index!.toString(), new FormControl<number|null>(100, [Validators.required, Validators.pattern(/^[0-9]*$/)]));
+        this.formGroup.addControl(index!.toString(), new FormControl<number|null>(r.salience||100, [Validators.required, Validators.pattern(/^[0-9]*$/)]));
       })
       this.ruleDesignDataSharingService.setConditionsChanged(true);
     });
@@ -163,10 +163,10 @@ export class RuleDesignComponent {
         const newRule: RuleDTO = {
           ruleName: result.ruleName,
           conditions: [],
-          salience: 100
+          salience: 100,
+          flgActive: false
         };
         this.rules = [...this.rules, newRule];
-        // this.updateRules()
         this.saveRules(newRule);
       }
     });
@@ -206,14 +206,15 @@ export class RuleDesignComponent {
     return this.formGroup.get(idRule.toString()) as FormControl;
   }
 
-  onSalienceChange(rule: RuleDTO) {
-    const control = this.getFormControl(rule.idRule!);
-    if (control && control.valid ) {
-      rule.salience = control.value;
-      this.rules = [...this.rules];
-      // this.saveRules();
-      this.updateRules()
+  onSalienceChange(rule: RuleDTO,i: number ) {
+    const control = this.getFormControl(i!);
+    if (!control || control.invalid ) {
+      console.error("Invalid control on salience change");
+      return;
     }
+    rule.salience = parseInt(control.value);
+    this.rules = [...this.rules];
+    this.updateRules()
   }
 
   deleteRule(rule: RuleDTO) {
@@ -245,8 +246,12 @@ export class RuleDesignComponent {
 
   }
 
-  toggleRuleActivation(idRule: number, $event: MatSlideToggleChange) {
-    console.warn("Toggle rule activation", idRule, $event.checked);
+  toggleRuleActivation(rule: RuleDTO, $event: MatSlideToggleChange) {
+    // console.warn("Toggle rule activation", idRule, $event.checked);
+    rule.flgActive = $event.checked;
+    this.designControllerService.activateRuleInProj(rule, parseInt(this.idProject)).subscribe(()=>{
+        console.warn("Rule activation updated successfully");
+    });
   }
 
 

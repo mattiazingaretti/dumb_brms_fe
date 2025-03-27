@@ -12,7 +12,8 @@
 import { ConditionDTO } from './conditionDTO';
 import { WorkflowDTO } from './workflowDTO';
 
-export interface RuleDTO { 
+export interface RuleDTO {
+    flgActive?: boolean;
     idRule?: number;
     salience?: number;
     ruleName?: string;

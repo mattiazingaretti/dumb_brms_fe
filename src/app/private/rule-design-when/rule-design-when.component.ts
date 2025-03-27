@@ -84,22 +84,22 @@ export class RuleDesignWhenComponent {
     }
 
     patchConditions(rules: RuleDTO[]) {
-        rules.find((r)=>r.idRule === this.idRule)!.conditions!.forEach((condition)=> this.addCondition(condition))
+        rules.find((r)=>r.idRule === this.idRule)!.conditions!.forEach((condition : ConditionDTO)=> this.addCondition(condition))
     }
 
-    addCondition(initialValue: any = null): void {
+    addCondition(initialValue: ConditionDTO | null = null): void {
         const conditionGroup = this.fb.group(
             {
                 conditionNameId: [
                     initialValue?.conditionNameId || '',
                     [Validators.required, this.uniqueIdConditionValidator()],
                 ],
-                useIdCondition: [initialValue?.useIdCondition || false],
+                flgUseIdCondition: [initialValue?.flgUseIdCondition || false],
                 className: [initialValue?.className || null, Validators.required],
                 field: [initialValue?.field || null, [Validators.required, this.matchClassDataTypeValidator()]],
                 operator: [initialValue?.operator || null,Validators.required],
                 value: [initialValue?.value || null, [this.requiredByUseIdCondTrue()]],
-                referencedIdCondition: [initialValue?.referencedIdCondition || null, [this.requiredByUseIdCondFalse()]],
+                referencedConditionNameId: [initialValue?.referencedConditionNameId || null, [this.requiredByUseIdCondFalse()]],
                 selectedIdConditionField: [initialValue?.selectedIdConditionField || null,[this.requiredByUseIdCondFalse()]],
             },
             { validators: this.matchClassDataTypeValidator() }
@@ -125,9 +125,9 @@ export class RuleDesignWhenComponent {
             .filter(idCondition => !!idCondition); // Filter out empty IDs
     }
 
-    getIdConditionFields(referencedIdCondition: string): any[] {
+    getIdConditionFields(referencedConditionNameId: string): any[] {
         const condition = this.conditionsArray.controls.find(
-            control => control.value.conditionNameId === referencedIdCondition
+            control => control.value.conditionNameId === referencedConditionNameId
         )?.value;
 
         if (condition && condition.className) {
@@ -156,9 +156,9 @@ export class RuleDesignWhenComponent {
         return (formGroup: FormGroup) => {
             const fieldControl = formGroup.get('field');
             const selectedIdConditionFieldControl = formGroup.get('selectedIdConditionField');
-            const selectedIdConditionControl = formGroup.get('referencedIdCondition');
+            const selectedIdConditionControl = formGroup.get('referencedConditionNameId');
             const classControl = formGroup.get('className');
-            const useIdConditionControl = formGroup.get('useIdCondition');
+            const useIdConditionControl = formGroup.get('flgUseIdCondition');
 
             if (
                 useIdConditionControl?.value &&
@@ -190,9 +190,9 @@ export class RuleDesignWhenComponent {
     }
 
     getSelectedFieldClass(fieldIdentifier: string): string | null {
-        const referencedIdCondition = this.conditionsForm.get('referencedIdCondition')?.value;
+        const referencedConditionNameId = this.conditionsForm.get('referencedConditionNameId')?.value;
         const condition = this.conditionsArray.controls.find(
-            control => control.value.idCondition === referencedIdCondition
+            control => control.value.idCondition === referencedConditionNameId
         )?.value;
 
         if (condition && condition.className) {
@@ -219,7 +219,7 @@ export class RuleDesignWhenComponent {
 
     private requiredByUseIdCondTrue() {
         return (formGroup: FormGroup) => {
-            const toggleControl = formGroup.get('useIdCondition')
+            const toggleControl = formGroup.get('flgUseIdCondition')
             const valueControl = formGroup.get('value')
             if(toggleControl && valueControl && toggleControl.value === true && (valueControl?.value === undefined || valueControl?.value === null || valueControl?.value === "")){
                 valueControl.setErrors({required: true})
@@ -233,8 +233,8 @@ export class RuleDesignWhenComponent {
 
     private requiredByUseIdCondFalse() {
         return (formGroup: FormGroup) => {
-            const toggleControl = formGroup.get('useIdCondition')
-            const referencedIdConditionControl = formGroup.get('referencedIdCondition')
+            const toggleControl = formGroup.get('flgUseIdCondition')
+            const referencedIdConditionControl = formGroup.get('referencedConditionNameId')
             const selectedIdConditionFieldControl = formGroup.get('selectedIdConditionField')
             if(toggleControl && referencedIdConditionControl && selectedIdConditionFieldControl && referencedIdConditionControl && toggleControl.value === false && (!referencedIdConditionControl.value || !selectedIdConditionFieldControl.value) ){
                 referencedIdConditionControl.setErrors({required: true})

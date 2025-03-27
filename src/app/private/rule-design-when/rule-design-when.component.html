@@ -12,7 +12,7 @@
             </mat-form-field>
 
             <!-- Toggle Button -->
-            <mat-slide-toggle formControlName="useIdCondition" *ngIf="isToggleVisible(i)">
+            <mat-slide-toggle formControlName="flgUseIdCondition" *ngIf="isToggleVisible(i)">
                 Use ID CONDITION List
             </mat-slide-toggle>
 
@@ -51,12 +51,12 @@
             </mat-form-field>
 
             <!-- Value Input or ID CONDITION Dropdown -->
-            <mat-form-field *ngIf="!condition.get('useIdCondition')?.value && condition.get('operator')?.value">
+            <mat-form-field *ngIf="!condition.get('flgUseIdCondition')?.value && condition.get('operator')?.value">
                 <input matInput formControlName="value" placeholder="Value" />
             </mat-form-field>
-            <mat-form-field *ngIf="condition.get('useIdCondition')?.value && condition.get('operator')?.value">
+            <mat-form-field *ngIf="condition.get('flgUseIdCondition')?.value && condition.get('operator')?.value">
                 <mat-label>Select ID CONDITION</mat-label>
-                <mat-select formControlName="referencedIdCondition">
+                <mat-select formControlName="referencedConditionNameId">
                     <mat-option *ngFor="let otherCondition of getOtherConditions(i)" [value]="otherCondition">
                         {{ otherCondition }}
                     </mat-option>
@@ -64,10 +64,10 @@
             </mat-form-field>
 
             <!-- Selected ID CONDITION Field Dropdown -->
-            <mat-form-field *ngIf="condition.get('useIdCondition')?.value && condition.get('referencedIdCondition')?.value">
+            <mat-form-field *ngIf="condition.get('flgUseIdCondition')?.value && condition.get('referencedConditionNameId')?.value">
                 <mat-label>SELECTED ID CONDITION FIELD</mat-label>
                 <mat-select formControlName="selectedIdConditionField">
-                    <mat-option *ngFor="let field of getIdConditionFields(condition.get('referencedIdCondition')?.value)" [value]="field.identifier">
+                    <mat-option *ngFor="let field of getIdConditionFields(condition.get('referencedConditionNameId')?.value)" [value]="field.identifier">
                         {{ field.identifier }}
                     </mat-option>
                 </mat-select>

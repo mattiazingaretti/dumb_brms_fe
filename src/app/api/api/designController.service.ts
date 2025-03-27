@@ -13,7 +13,6 @@
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams,
          HttpResponse, HttpEvent }                           from '@angular/common/http';
-
 import { Observable }                                        from 'rxjs';
 
 import { PostedResourceDTO } from '../model/postedResourceDTO';
@@ -60,6 +59,57 @@ export class DesignControllerService {
         return false;
     }
 
+
+    /**
+     * 
+     * 
+     * @param body 
+     * @param projectId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public activateRuleInProj(body: RuleDTO, projectId: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public activateRuleInProj(body: RuleDTO, projectId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public activateRuleInProj(body: RuleDTO, projectId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public activateRuleInProj(body: RuleDTO, projectId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling activateRuleInProj.');
+        }
+
+        if (projectId === null || projectId === undefined) {
+            throw new Error('Required parameter projectId was null or undefined when calling activateRuleInProj.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.request<any>('patch',`${this.basePath}/design/activateRuleInProj/${encodeURIComponent(String(projectId))}`,
+            {
+                body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
 
     /**
      * 

@@ -16,6 +16,8 @@ export interface ConditionDTO {
     field?: string;
     operator?: string;
     conditionNameId?: string;
+    referencedConditionNameId? : string;
+    selectedIdConditionField? : string;
     value?: any;
     flgUseIdCondition?: boolean;
 }
