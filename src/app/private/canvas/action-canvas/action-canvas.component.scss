@@ -46,7 +46,13 @@
     }
   }
 }
-
+.f-connections-dragging {
+  .f-node-input {
+    &:not(.f-node-input-can-be-connected-to) {
+      background-color: var(--disabled-color);
+    }
+  }
+}
 .connection-marker{
     @include app.connection;
     @include app.connection-marker;

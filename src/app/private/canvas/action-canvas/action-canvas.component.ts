@@ -17,7 +17,8 @@ import {
   FZoomDirective
 } from "@foblex/flow";
 import {
-  BlocksSharingService, ConnectorDir,
+  BlocksSharingService,
+  ConnectorDir,
   IdConnector,
   IdConnectorDataField,
   IdConnectorParam
@@ -34,11 +35,12 @@ import {
   MatHeaderRowDef,
   MatRow,
   MatRowDef,
-  MatTable
+  MatTable,
 } from "@angular/material/table";
 import {MatChipRow} from "@angular/material/chips";
 import {ActionParamResponseDTO} from "../../../api/model/actionParamResponseDTO";
 import {MatButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
 import {Subscription} from "rxjs";
 import {RuleInputFieldResponseDTO} from "../../../api/model/ruleInputFieldResponseDTO";
 import {RuleOutputFieldResponseDTO} from "../../../api/model/ruleOutputFieldResponseDTO";
@@ -71,7 +73,8 @@ export interface Connection{
     MatHeaderCellDef,
     MatHeaderRowDef,
     MatRowDef,
-    MatButton
+    MatButton,
+      MatIcon
   ],
   templateUrl: './action-canvas.component.html',
   styleUrl: './action-canvas.component.scss',
@@ -88,7 +91,7 @@ export class ActionCanvasComponent {
   connections: Connection[] = [];
   idConnectors: IdConnector[] = [];
   subjects: Subscription[] = [];
-
+  disabledConnectors: { [key: string]: boolean } = {};
 
   @ViewChild('flowComponent', {static: true}) flowComponent!: FFlowComponent;
   @ViewChild('flowCanvas', {static: true}) flowCanvas!: FCanvasComponent;
@@ -111,6 +114,9 @@ export class ActionCanvasComponent {
 
     const connectorSub = this.blocksSharingService.getConnectorMapping().subscribe((connectors) => {
       this.idConnectors = connectors;
+      this.idConnectors.forEach((id)=>{
+        this.disabledConnectors[id.id] = false;
+      })
     });
     this.subjects.push(blockSub, connectorSub);
   }
@@ -224,14 +230,37 @@ export class ActionCanvasComponent {
   }
 
 
-  getDataBlockConnectableInputs(block: Block, field: RuleInputFieldResponseDTO | RuleOutputFieldResponseDTO) {
-    const ids =  this.idConnectors
-        .filter((c)=> c.blockKey !== block.key)
-        .filter((c)=> {
-          return (c as IdConnectorDataField).fieldType === field.fieldType
-        })
+  getBlockConnectableInputs(block: Block, field?: RuleInputFieldResponseDTO | RuleOutputFieldResponseDTO , param?: any ) {
+    let connectableBlocksFromActionBlocks: string[] = []
+    let connectableActionsFromDataBlock: string[] = []
 
-    console.warn(ids)
-    return ids.map((c)=> c.id)||[]
+    if(field){
+      connectableActionsFromDataBlock = this.idConnectors
+          .filter((b)=> b.blockKey !== block.key)
+          .filter((id)=> id.type === BlockType.ACTION)
+          .filter((c)=> {
+            return (c as IdConnectorParam).paramType === field.fieldType
+          }).map((c)=>c.id)
+    }
+    if(param){
+      connectableBlocksFromActionBlocks = this.idConnectors
+          .filter((b)=> b.blockKey !== block.key)
+          .filter((c)=> {
+            if (c.type === BlockType.ACTION){
+              return (c as IdConnectorParam).paramType === param.paramType
+            }else{
+              return (c as IdConnectorDataField).fieldType === param.paramType
+            }
+          }).map((c)=>c.id)
+    }
+    console.warn("connectable inputs ",field, connectableBlocksFromActionBlocks, this.idConnectors);
+    if (connectableBlocksFromActionBlocks.length === 0 && connectableActionsFromDataBlock.length === 0){
+        return [''] //empty string is used to represent no connectable blocks as far as I understand from the library
+    }
+    return [...connectableBlocksFromActionBlocks, ...connectableActionsFromDataBlock]
+  }
+
+  isDisabledConnector(dataConnectorId: string) {
+    return this.disabledConnectors[dataConnectorId]|| false;
   }
 }

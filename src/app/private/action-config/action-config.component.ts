@@ -29,6 +29,7 @@ import {ActionParamResponseDTO} from "../../api/model/actionParamResponseDTO";
 import {IPoint} from "@foblex/core";
 import {ActionCanvasComponent} from "../canvas/action-canvas/action-canvas.component";
 import {BlocksSharingService} from "../canvas/services/blocks-sharing.service";
+import {ConditionDTO} from "../../api/model/conditionDTO";
 
 export interface Workflow {
   name: string;
@@ -75,7 +76,6 @@ export interface ActionBlock extends Block {
     FFlowModule,
     FooterComponent,
     MatButtonModule,
-    MatIcon,
     MatSelect,
     MatOption,
     MatSidenavContent,
@@ -94,7 +94,8 @@ export interface ActionBlock extends Block {
     MatChipRow,
     NgIf,
     ReactiveFormsModule,
-    ActionCanvasComponent
+    ActionCanvasComponent,
+    MatIcon
   ],
   templateUrl: './action-config.component.html',
   styleUrls: ['./action-config.component.css','./action-config.component.scss'],
@@ -114,7 +115,7 @@ export class ActionConfigComponent {
   blocks: Block[] = [];
 
   rule?: Rule;
-  dataDropDownOptions: Condition[] = [];
+  dataDropDownOptions: ConditionDTO[] = [];
   actionsDropDownOptions: ActionWithParamsResponseDTO[] = [];
 
   constructor(
@@ -200,7 +201,7 @@ export class ActionConfigComponent {
       return;
     }
     const selectedData : string = dataBlockControl.value as string;
-    const selectedCondition = this.dataDropDownOptions.find((c)=> c.class === selectedData)
+    const selectedCondition = this.dataDropDownOptions.find((c)=> c.className === selectedData)
 
     if(selectedCondition === undefined){
       console.error("Failed to find selected condition");
@@ -226,7 +227,7 @@ export class ActionConfigComponent {
       this.blocks.push({showFields: false,idCondition: selectedCondition.idCondition, name: `${selectedCondition.idCondition} : ${selectedData}` ,key: `output_${lastId+1}` ,position: {x:200,y : 200},type: BlockType.OUTPUT_DATA, data: data} as Block);
     }
     //remove from available options when it is created.
-    this.dataDropDownOptions = this.dataDropDownOptions.filter((c)=> c.class !== selectedData)
+    this.dataDropDownOptions = this.dataDropDownOptions.filter((c)=> c.className !== selectedData)
 
     this.blocksSharingService.setBlocks(this.blocks);
   }
